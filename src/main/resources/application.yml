@@ -12,8 +12,19 @@ spring:
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1
-    username:
+    username: sa
     password:
+  jpa:
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+        format_sql: true
+        show_sql: true
+        ddl-auto: create-drop
+        id:
+          new_generator_mappings: false
+      hbm2ddl:
+        auto: none
 
 # 로그레벨의 설정  쿼리 및 결과의 로그 출력 레벨 조정이 가능
 logging:
@@ -22,8 +33,6 @@ logging:
 
 # log설정
 log:
-  path: /log/search/web
-  name: web.log
   pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%X{identity}] %msg %n"
   appender: console
 

@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
-	<springProperty scope="context" name="LOG_PATH" source="log.path" />
-	<springProperty scope="context" name="LOG_NAME" source="log.name" />
 	<springProperty scope="context" name="LOG_PATTERN" source="log.pattern" />
 	<springProperty scope="context" name="LOG_APPENDER" source="log.appender" defaultValue="console" />
 
