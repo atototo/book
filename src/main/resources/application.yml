@@ -1,0 +1,31 @@
+# 공통설정
+server:
+  port: 8080
+
+#http://localhost:8080/h2-console
+spring:
+  h2:
+    console:
+      enabled: true
+  profiles:
+    active: local
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1
+    username:
+    password:
+
+# 로그레벨의 설정  쿼리 및 결과의 로그 출력 레벨 조정이 가능
+logging:
+  level:
+    com.bs.search: INFO
+
+# log설정
+log:
+  path: /log/search/web
+  name: web.log
+  pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%X{identity}] %msg %n"
+  appender: console
+
+thymeleaf:
+  cache: false
