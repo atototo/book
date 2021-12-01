@@ -1,6 +1,6 @@
 package com.bs.search;
 
-import com.bs.search.service.MemberService;
+import com.bs.search.service.SearchService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -11,7 +11,7 @@ import org.springframework.context.ApplicationContext;
 public class SearchApplication {
 	public static void main(String[] args) {
 		ApplicationContext ctx = SpringApplication.run(SearchApplication.class, args);
-		MemberService memberService = ctx.getBean(MemberService.class) ;
-		memberService.saveAll();
+		SearchService searchService = ctx.getBean(SearchService.class) ;
+		searchService.saveAll();
 	}
 }

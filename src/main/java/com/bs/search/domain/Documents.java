@@ -27,4 +27,5 @@ public class Documents {
     private int salePrice;
     private String thumbnail;
     private String status;
+
 }

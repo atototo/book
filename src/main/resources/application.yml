@@ -24,7 +24,7 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
         format_sql: true
-        show_sql: true
+        show_sql: false
         ddl-auto: create-drop
         id:
           new_generator_mappings: false
