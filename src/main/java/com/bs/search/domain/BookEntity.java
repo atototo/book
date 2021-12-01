@@ -21,7 +21,7 @@ import java.util.List;
 public class BookEntity {
 
     @Id // 해당 테이블의 PK 필드
-    @Column(name = "bookId")
+    @Column(name = "book_id")
     private Long id;
 
     @Column(name = "title")

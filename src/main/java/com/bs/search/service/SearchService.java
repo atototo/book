@@ -2,16 +2,12 @@ package com.bs.search.service;
 
 import com.bs.search.common.ApiEnum;
 import com.bs.search.domain.*;
-import com.bs.search.dto.DocumentsDto;
 import com.bs.search.mapper.DocumentsMapper;
 import com.bs.search.vo.BookApiVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -27,8 +23,8 @@ import java.util.stream.IntStream;
 public class SearchService {
     private final RestTemplate restTemplate;
     private final BookRepository bookRepository;
-    private final AuthorsRepository authorsRepository;
-    private final TranslatorsRepository translatorsRepository;
+    private final AuthorsEntityRepository authorsRepository;
+    private final TranslatorsEntityRepository translatorsRepository;
 
     @Value("${api.uri}")
     private String bookApiUri;
@@ -118,68 +114,76 @@ public class SearchService {
         return Collections.singletonList(bookRepository.findAll());
     }
 
-    public List<BookEntity> fildAllBooksByTitle(String title) {
-        return bookRepository.findAllByTitle(title);
+    public  ResponseEntity<List<?>> fildAllBooksByTitle(String title) {
+
+        List<BookEntity> listBooks = bookRepository.findAllByTitle(title);
+
+        if(listBooks.size() == 0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(new String[]{"데이터 없음."}));
+        }
+        return ResponseEntity.status(200).body(listBooks);
     }
 
     public List<BookEntity> fidAllBooksByPrice(long min, long max) {
        return bookRepository.findAllByPriceBetween(min,max);
     }
 
-    private List<AuthorsEntity> findAllAuthorsByTitle(String title) {
-        return authorsRepository.findAllByTitle(title);
-    }
-
-    private List<TranslatorsEntity> findAllTranslatorsByTitle(String title) {
-        return translatorsRepository.findAllByTitle(title);
-    }
-
-    public List<DocumentsDto> findAllDocumentsByTitle(String title) {
-
-        List<BookEntity> listBook = fildAllBooksByTitle(title);
-        Optional<List<BookEntity>> listOptBook = Optional.of(listBook);
-
-        List<AuthorsEntity> listAuthors = findAllAuthorsByTitle(title);
-        Optional<List<AuthorsEntity>> listOptAuth = Optional.of(listAuthors);
-
-        List<TranslatorsEntity> listTranslator = findAllTranslatorsByTitle(title);
-        Optional<List<TranslatorsEntity>> listOptTrans = Optional.of(listTranslator);
-
-        List<DocumentsDto> listDoc = new ArrayList<>();
-        if (!listOptBook.isEmpty()) {
-            listBook.parallelStream().forEach(s->{
-
-                List<AuthorsEntity> listAuth = new ArrayList<>( );
-                if(!listOptAuth.isEmpty()) {
-                    listAuth = listAuthors.parallelStream().filter(y -> y.getId().equals(s.getId())).collect(Collectors.toList());
-                }
-
-                List<TranslatorsEntity> listTrans = new ArrayList<>( );
-                if (!listOptTrans.isEmpty()) {
-                    listTrans = listTranslator.parallelStream().filter(y -> y.getId().equals(s.getId())).collect(Collectors.toList());
-
-                }
 
 
-
-                listDoc.add(DocumentsDto.builder()
-                        .title(s.getTitle())
-                        .authors(listAuth)
-                        .contents(s.getContents())
-                        .thumbnail(s.getThumbnail())
-                        .isbn(s.getIsbn())
-                        .publisher(s.getPublisher())
-                        .datetime(s.getDatetime())
-                        .price(s.getPrice())
-                        .salePrice(s.getSalePrice())
-                        .status(s.getStatus())
-                        .url(s.getUrl())
-                        .translators(listTrans)
-                        .build()
-                );
-            });
-        }
-
-        return listDoc;
-    }
+//    private List<AuthorsEntity> findAllAuthorsByTitle(String title) {
+//        return authorsRepository.findAllByTitle(title);
+//    }
+//
+//    private List<TranslatorsEntity> findAllTranslatorsByTitle(String title) {
+//        return translatorsRepository.findAllByTitle(title);
+//    }
+//
+//    public List<DocumentsDto> findAllDocumentsByTitle(String title) {
+//
+//        List<BookEntity> listBook = fildAllBooksByTitle(title);
+//        Optional<List<BookEntity>> listOptBook = Optional.of(listBook);
+//
+//        List<AuthorsEntity> listAuthors = findAllAuthorsByTitle(title);
+//        Optional<List<AuthorsEntity>> listOptAuth = Optional.of(listAuthors);
+//
+//        List<TranslatorsEntity> listTranslator = findAllTranslatorsByTitle(title);
+//        Optional<List<TranslatorsEntity>> listOptTrans = Optional.of(listTranslator);
+//
+//        List<DocumentsDto> listDoc = new ArrayList<>();
+//        if (!listOptBook.isEmpty()) {
+//            listBook.parallelStream().forEach(s->{
+//
+//                List<AuthorsEntity> listAuth = new ArrayList<>( );
+//                if(!listOptAuth.isEmpty()) {
+//                    listAuth = listAuthors.parallelStream().filter(y -> y.getId().equals(s.getId())).collect(Collectors.toList());
+//                }
+//
+//                List<TranslatorsEntity> listTrans = new ArrayList<>( );
+//                if (!listOptTrans.isEmpty()) {
+//                    listTrans = listTranslator.parallelStream().filter(y -> y.getId().equals(s.getId())).collect(Collectors.toList());
+//
+//                }
+//
+//
+//
+//                listDoc.add(DocumentsDto.builder()
+//                        .title(s.getTitle())
+//                        .authors(listAuth)
+//                        .contents(s.getContents())
+//                        .thumbnail(s.getThumbnail())
+//                        .isbn(s.getIsbn())
+//                        .publisher(s.getPublisher())
+//                        .datetime(s.getDatetime())
+//                        .price(s.getPrice())
+//                        .salePrice(s.getSalePrice())
+//                        .status(s.getStatus())
+//                        .url(s.getUrl())
+//                        .translators(listTrans)
+//                        .build()
+//                );
+//            });
+//        }
+//
+//        return listDoc;
+//    }
 }

@@ -28,7 +28,7 @@ public class TranslatorsEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="bookId")
+    @JoinColumn(name="book_id")
     private BookEntity book;
 
     @Column(name = "title")

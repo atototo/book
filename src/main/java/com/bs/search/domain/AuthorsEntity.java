@@ -35,7 +35,7 @@ public class AuthorsEntity {
     private String author;
 
     @ManyToOne
-    @JoinColumn(name="bookId")
+    @JoinColumn(name="book_id")
     private BookEntity book;
 
 
