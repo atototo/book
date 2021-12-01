@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<!-- 관련 Namespace 선언 및 layout:decorate 추가 -->
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/layout}">
+<head>
+    <!-- layout.html 에 들어간 head 부분을 제외하고 개별 파일에만 적용되는 head 부분 추가 -->
+    <title>mainPage</title>
+    <script>
+            $(document).ready(function() {
+alert(1);
+            });
+
+            function searchBook() {
+                alert(1);
+                // var keyword = $("#keyword").val();
+                // if( !keyword ) {
+                //     alert("주소 키워드를 입력 후 검색하여 주세요.");
+                //     return;
+                // }
+                // alert(keyword);
+                //
+                // $.ajax({
+                //     url : "/molit/procJuso",
+                //     data : {"keyword" : $("#keyword").val()},
+                //     type : "POST",
+                //     contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                //     success : function(data) {
+                //         var returnData = data;
+                //         if (returnData.cdResult != "00") {
+                //             alert(returnData.message);
+                //             return false;
+                //         } else {
+                //             var obj = returnData.returnObj;
+                //             if (obj != null) {
+                //                 var tbody = "";
+                //                 var results = obj.results;
+                //                 for (var i = 0; i < results.juso.length; i++) {
+                //                     tbody +="<div class='btn addr-result-list' onclick='mapBrExposDongFlr(" + JSON.stringify(results.juso[i]) + ");'>";
+                //                     tbody +=	"<input type='radio' name='options'/>";
+                //                     tbody +=	"<div class='addr-result-item'>";
+                //                     if(results.juso[i].bdKdcd == '1') {
+                //                         tbody +=		"<div class='addr-icon'><i class='icon icon-apt'></i></div>";
+                //                     } else {
+                //                         tbody +=		"<div class='addr-icon'><i class='icon icon-house'></i></div>";
+                //                     }
+                //                     tbody +=		"<dl class='addr-group'>";
+                //                     tbody +=			"<dt>도로명 주소</dt>";
+                //                     tbody +=			"<dd>" + results.juso[i].roadAddr + "</dd>";
+                //                     tbody +=			"<dt>지번 주소</dt>";
+                //                     tbody +=			"<dd>" + results.juso[i].jibunAddr + "</dd>";
+                //                     tbody +=		"</dl>";
+                //                     tbody +=	"</div>";
+                //                     tbody +="</div>";
+                //                 }
+                //             }
+                //             $("#search-result").html(tbody);
+                //             $("#addr-search-result-cnt").html(results.juso.length+"건");
+                //             $(".addr-search-result").show();
+                //             $("html,body").animate({scrollTop:document.querySelector(".addr-search-result").offsetTop},600);
+                //         }
+                //     }
+                // });
+            }
+
+        </script>
+    <!-- 필요하다면 개별 파일에 사용될 css/js 선언  -->
+</head>
+
+<!-- layout.html에 정의한 main page 부분 -->
+<th:block layout:fragment="content">
+    <section class="w3l-cover-3">
+        <div class="cover top-bottom">
+            <div class="container">
+                <div class="middle-section text-center">
+                    <div class="section-width">
+                        <p>도서검색</p>
+                        <h2>키워드를 입력해주세요</h2>
+                        <div class="most-searches">
+                            <h4>Most Searches</h4>
+                            <ul>
+                                <li><a href="#link">1</a></li>
+                                <li><a href="#link">Apartment</a></li>
+                                <li><a href="#link">Private house</a></li>
+                            </ul>
+                        </div>
+                        <form action="#" class="w3l-cover-3-gd" method="GET">
+                            <span class="input-group-btn">
+                                    <select class="btn btn-default" name="ext" required>
+                                        <option selected="">Office</option>
+                                        <option>Villa</option>
+                                        <option>Apartment</option>
+                                        <option>Private house</option>
+                                        <option>Building</option>
+                                        <option>Shop</option>
+                                        <option>Social housing</option>
+                                        <option>Town house</option>
+                                    </select>
+                                </span>
+                            <input type="search" name="keyword" id="keyword" placeholder="Enter keywords" required>
+                            <button   th:onclick="'javascript:searchBook();'" class="btn-primary">Search</button>
+                        </form>
+                    </div>
+                    <section id="bottom" class="demo">
+                        <a href="#bottom"><span></span>Scroll</a>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+</th:block>

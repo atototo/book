@@ -2,11 +2,11 @@ package com.bs.search.vo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -20,13 +20,14 @@ public class BookApiVO {
     private Meta meta;
 
     @JsonProperty("documents")
-    private Meta documents;
+    private List<Documents> documents;
 
     @Getter
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @NoArgsConstructor
-    public static class documents {
+    @ToString()
+    public static class Documents {
         private String url;
         private List<String> translators;
         private String title;
@@ -45,6 +46,7 @@ public class BookApiVO {
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @NoArgsConstructor
+    @ToString()
     public static class Meta {
         private int totalCount;
         private int pageableCount;

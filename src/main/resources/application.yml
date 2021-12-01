@@ -34,6 +34,9 @@ spring:
 # 로그레벨의 설정  쿼리 및 결과의 로그 출력 레벨 조정이 가능
 logging:
   level:
+    org:
+      hibernate:
+        type: trace
     com.bs.search: INFO
 
 # log설정
@@ -50,5 +53,5 @@ api:
     head: Authorization
     auth: KakaoAK
     key: KakaoAK 8c65087a8ceb9dafcbcaefbd5bff3599
-    url: https://dapi.kakao.com/v3/search/book?target=title
+    uri: https://dapi.kakao.com/v3/search/book?target=title
 
