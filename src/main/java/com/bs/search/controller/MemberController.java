@@ -1,6 +1,7 @@
 package com.bs.search.controller;
 
 import com.bs.search.service.MemberService;
+import com.bs.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 @Slf4j
 public class MemberController {
     private final MemberService service;
+    private final SearchService searchService;
 
     @GetMapping(value = "/save")
     public ResponseEntity<String> save() {
@@ -26,7 +28,12 @@ public class MemberController {
 
     @GetMapping(value = "/saveAll")
     public ResponseEntity<String> saveAll() {
-        service.saveAll();
+//        service.saveAll();
+        try {
+            searchService.selectAll();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.status(200).body("성공");
     }
 
