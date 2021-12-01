@@ -38,3 +38,6 @@ log:
 
 thymeleaf:
   cache: false
+
+book-api:
+  uri: "https://dapi.kakao.com/v3/search/book"
