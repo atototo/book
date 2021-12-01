@@ -1,6 +1,8 @@
-package com.bs.search.domain;
+package com.bs.search.dto;
 
 
+import com.bs.search.domain.AuthorsEntity;
+import com.bs.search.domain.TranslatorsEntity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,15 +16,15 @@ import java.util.List;
 @ToString
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Documents {
+public class DocumentsDto {
     private String title;
     private String contents;
     private String url;
     private String isbn;
     private String datetime;
-    private List<Authors> authors;
+    private List<AuthorsEntity> authors;
     private String publisher;
-    private List<Translators> translators;
+    private List<TranslatorsEntity> translators;
     private int price;
     private int salePrice;
     private String thumbnail;

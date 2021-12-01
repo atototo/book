@@ -6,7 +6,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.Optional;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,10 +18,10 @@ import java.util.Optional;
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "book")
-public class Book {
+public class BookEntity {
 
     @Id // 해당 테이블의 PK 필드
-    @Column(name = "id")
+    @Column(name = "bookId")
     private Long id;
 
     @Column(name = "title")
@@ -54,7 +54,9 @@ public class Book {
     @Column(name = "status")
     private String status;
 
-    public Optional<String> getStatusNull() {
-        return Optional.ofNullable(status);
-    }
+    @OneToMany(mappedBy = "book")
+    private List<AuthorsEntity> authorsList;
+
+    @OneToMany(mappedBy = "book")
+    private List<TranslatorsEntity> translatorsList;
 }

@@ -1,6 +1,6 @@
 package com.bs.search.controller;
 
-import com.bs.search.domain.Documents;
+import com.bs.search.dto.DocumentsDto;
 import com.bs.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class SearchController {
     @GetMapping(value = "/books/title/{title}")
     public ResponseEntity<List> booksByTitle(@PathVariable(value = "title") String title) {
         log.info("title 아 어디갔니이 : {}", title);
-        List<Documents> listDoc =  searchService.findAllDocumentsByTitle(title);
+        List<DocumentsDto> listDoc =  searchService.findAllDocumentsByTitle(title);
 
         if(listDoc.size() == 0){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(new String[]{"데이터 없음."}));

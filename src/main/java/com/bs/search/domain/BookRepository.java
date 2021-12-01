@@ -4,9 +4,9 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface BookRepository extends CrudRepository<Book, Long> {
+public interface BookRepository extends CrudRepository<BookEntity, Long> {
 
-    List<Book> findAllByTitle(String name);
+    List<BookEntity> findAllByTitle(String name);
 
-    List<Book> findAllByPriceBetween(long min, long max);
+    List<BookEntity> findAllByPriceBetween(long min, long max);
 }

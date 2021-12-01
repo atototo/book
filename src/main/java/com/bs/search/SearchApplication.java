@@ -12,6 +12,6 @@ public class SearchApplication {
 	public static void main(String[] args) {
 		ApplicationContext ctx = SpringApplication.run(SearchApplication.class, args);
 		SearchService searchService = ctx.getBean(SearchService.class) ;
-		searchService.saveAll();
+		searchService.saveDocumentsAll();
 	}
 }

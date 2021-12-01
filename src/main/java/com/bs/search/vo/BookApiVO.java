@@ -3,13 +3,9 @@ package com.bs.search.vo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Getter
 @Setter
@@ -26,8 +22,7 @@ public class BookApiVO {
     @Getter
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-    @NoArgsConstructor
-    @ToString()
+    @NoArgsConstructor      //json
     public static class Documents {
         private String url;
         private List<String> translators;
@@ -42,11 +37,6 @@ public class BookApiVO {
         private String contents;
         private List<String> authors;
 
-        public Optional<List<String>> getaAuthorsNull() {
-            return Optional.ofNullable(authors);
-        }
-        public Optional<String> getTranslatorsNull(long idx) {
-            return Optional.ofNullable(translators.get((int) idx));}
     }
 
     @Getter

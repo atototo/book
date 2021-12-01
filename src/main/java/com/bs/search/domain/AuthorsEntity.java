@@ -17,7 +17,7 @@ import javax.persistence.*;
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "authors")
-public class Authors {
+public class AuthorsEntity {
 
     @Id // 해당 테이블의 PK 필드
     @GeneratedValue(strategy = GenerationType.IDENTITY) // PK생성규칙
@@ -33,4 +33,10 @@ public class Authors {
 
     @Column(name = "author")
     private String author;
+
+    @ManyToOne
+    @JoinColumn(name="bookId")
+    private BookEntity book;
+
+
 }

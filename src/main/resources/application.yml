@@ -11,7 +11,7 @@ spring:
     livereload:
       enabled: true
     restart:
-      enabled: false
+      enabled: true
   profiles:
     active: local
   datasource:
@@ -32,12 +32,17 @@ spring:
         auto: none
 
 # 로그레벨의 설정  쿼리 및 결과의 로그 출력 레벨 조정이 가능
+#logging:
+#  level:
+#    org:
+#      hibernate:
+#        type: trace
+#    com.bs.search: INFO
+
 logging:
   level:
-    org:
-      hibernate:
-        type: trace
     com.bs.search: INFO
+
 
 # log설정
 log:
