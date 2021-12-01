@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -40,6 +41,12 @@ public class BookApiVO {
         private String datetime;
         private String contents;
         private List<String> authors;
+
+        public Optional<List<String>> getaAuthorsNull() {
+            return Optional.ofNullable(authors);
+        }
+        public Optional<String> getTranslatorsNull(long idx) {
+            return Optional.ofNullable(translators.get((int) idx));}
     }
 
     @Getter

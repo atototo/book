@@ -1,9 +1,6 @@
 package com.bs.search.service;
 
-import com.bs.search.domain.Book;
-import com.bs.search.domain.BookRepository;
-import com.bs.search.domain.Member;
-import com.bs.search.domain.MemberRepository;
+import com.bs.search.domain.*;
 import com.bs.search.vo.BookApiVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +15,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,6 +24,8 @@ public class MemberService {
     private final RestTemplate restTemplate;
     private final MemberRepository repository;
     private final BookRepository bookRepository;
+    private final AuthorsRepository authorsRepository;
+    private final TranslatorsRepository translatorsRepository;
 
     @Value("${api.uri}")
     private String bookApiUri;
@@ -33,6 +33,7 @@ public class MemberService {
     @Value("${api.key}")
     private String key;
 
+    private static long idxCnt = 1;
 
 
     public void save() {
@@ -55,13 +56,9 @@ public class MemberService {
 
         //한번에 최대 50개씩
         int totalCnt = response.getBody().getMeta().getTotalCount();
-        //false 일 경우 페이지 증가하여 재호출
-        boolean isEnd =  response.getBody().getMeta().isEnd();
-        log.info("totalCount : {} ",totalCnt);
-        log.info("isEnd : {} ",isEnd);
 
-        HashMap<Integer,ArrayList<BookApiVO.Documents>> docMap = new HashMap<Integer,ArrayList<BookApiVO.Documents>>();
-        int reqCnt = 1;
+        HashMap<Long,ArrayList<BookApiVO.Documents>> docMap = new HashMap<Long,ArrayList<BookApiVO.Documents>>();
+        long reqCnt = 1;
         while (totalCnt > 0) {
             UriComponents  reUri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
                     .queryParam("target", "title")
@@ -75,13 +72,15 @@ public class MemberService {
             docMap.put(reqCnt,listDoc ) ;
             reqCnt+=1;
             totalCnt = totalCnt - listDoc.size();
-            isEnd = resApi.getBody().getMeta().isEnd();
-            log.info("isEnd totalCnt : {} ",totalCnt);
         }
 
         ArrayList<Book> listBook = new ArrayList<Book>();
+        ArrayList<Translators> listTrans = new ArrayList<Translators>();
+        ArrayList<Authors> listAuthors = new ArrayList<Authors>();
+        Optional<BookApiVO.Documents> mayDoc = Optional.empty();
         docMap.forEach((k,v) -> {
             v.stream().forEach(s -> {
+
                 listBook.add(Book.builder()
                         .title(s.getTitle())
                         .contents(s.getContents())
@@ -92,31 +91,35 @@ public class MemberService {
                         .salePrice(s.getSalePrice())
                         .thumbnail(s.getThumbnail())
                         .status(s.getStatus())
+                        .id(idxCnt)
                         .build()
                 );
+
+
+                if(s.getAuthors().size() > 0) {
+                    listAuthors.add(Authors.builder()
+                            .id(idxCnt)
+                            .title(s.getTitle())
+                            .author(s.getAuthors().stream().collect(Collectors.joining(" ,")))
+                            .build()
+                    );
+                };
+
+                 if (s.getTranslators().size() > 0) {
+                    listTrans.add(Translators.builder()
+                            .id(idxCnt)
+                            .title(s.getTitle())
+                            .translator(s.getTranslators().stream().collect(Collectors.joining(" ,")))
+                            .build()
+                    );
+                }
+                idxCnt++;
             });
         });
-//        docMap..forEach( t -> {
-//            t.stream().forEach(s -> {
-//                listBook.add(Book.builder()
-//                        .title(s.getTitle())
-//                        .contents(s.getContents())
-//                        .url(s.getUrl())
-//                        .isbn(s.getUrl())
-//                        .datetime(s.getDatetime())
-//                        .price(s.getPrice())
-//                        .salePrice(s.getSalePrice())
-//                        .thumbnail(s.getThumbnail())
-//                        .status(s.getStatus())
-//                        .build()
-//                );
-//            });
-//        });
 
         bookRepository.saveAll(listBook);
-        log.info("api response meta : {}", response.getBody().getMeta().toString());
-        log.info("api response meta : {}", response.getBody().getMeta().getTotalCount());
-
+        authorsRepository.saveAll(listAuthors);
+        translatorsRepository.saveAll(listTrans);
     }
 
     public List findAll() {

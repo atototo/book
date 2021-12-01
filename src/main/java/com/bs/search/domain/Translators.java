@@ -21,8 +21,11 @@ public class Translators {
 
     @Id // 해당 테이블의 PK 필드
     @GeneratedValue(strategy = GenerationType.IDENTITY) // PK생성규칙
-    @Column(name = "id")
+    @Column(name = "idx")
     private Long idx;
+
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "title")
     private String title;
