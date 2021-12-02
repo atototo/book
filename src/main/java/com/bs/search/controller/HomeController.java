@@ -25,13 +25,20 @@ public class HomeController {
     public String helloWorld(Model model){
         log.info("home controller");
 
-        return "index";
+        return "search";
     }
 
 
     @GetMapping("/searchBookByTitle")
     @ResponseBody
     public ResponseEntity<List<?>> searchBookByTitle(@RequestParam String title, HttpServletResponse response) throws IOException {
+        log.info("title  :: {}", title);
       return searchService.fildAllBooksByTitle(title);
+    }
+
+    @GetMapping("/searchBookByBookId")
+    @ResponseBody
+    public ResponseEntity<List<?>> searchBookByBookId(@RequestParam String title, HttpServletResponse response) throws IOException {
+      return searchService.fildAllBooksById(title);
     }
 }

@@ -24,12 +24,13 @@ public class TranslatorsEntity {
     @Column(name = "idx")
     private Long idx;
 
-    @Column(name="id")
+    @Column(name="trans_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name="book_id")
-    private BookEntity book;
+    //다대일 (번역자 책 N:1)
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name="book_id")
+//    private BookEntity book;
 
     @Column(name = "title")
     private String title;

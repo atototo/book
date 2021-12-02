@@ -9,4 +9,6 @@ public interface BookRepository extends CrudRepository<BookEntity, Long> {
     List<BookEntity> findAllByTitle(String name);
 
     List<BookEntity> findAllByPriceBetween(long min, long max);
+
+    List<BookEntity> findAllById(Long id);
 }

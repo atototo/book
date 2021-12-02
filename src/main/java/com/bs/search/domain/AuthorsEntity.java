@@ -24,7 +24,7 @@ public class AuthorsEntity {
     @Column(name = "idx")
     private Long idx;
 
-    @Column(name = "id")
+    @Column(name = "author_id")
     private Long id;
 
     @Column(name = "title")
@@ -34,9 +34,10 @@ public class AuthorsEntity {
     @Column(name = "author")
     private String author;
 
-    @ManyToOne
-    @JoinColumn(name="book_id")
-    private BookEntity book;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name="book_id")
+//    private BookEntity book;
+
 
 
 }

@@ -60,9 +60,10 @@ public class SearchService {
         int reqApiCnt = totalCnt%reqMaxCnt> 0? (totalCnt / reqMaxCnt )+1 : (totalCnt / reqMaxCnt );
 
         ArrayList<BookApiVO.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt).mapToObj(i -> (ArrayList<BookApiVO.Documents>) createUriCompnentAndExcute(i, reqMaxCnt).getBody().getDocuments()).flatMap(Collection::stream).collect(Collectors.toCollection(ArrayList::new));
-        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiVOToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new)));
-        authorsRepository.saveAll(makeDocumenetsToAuthorsList(listDoc));
-        translatorsRepository.saveAll(makeDocumenetsToTransotrsList(listDoc));
+        ArrayList<BookEntity> listBook = IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiVOToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new));
+        bookRepository.saveAll(listBook);
+        authorsRepository.saveAll(makeDocumenetsToAuthorsList(listDoc, listBook));
+        translatorsRepository.saveAll(makeDocumenetsToTransotrsList(listDoc, listBook));
     }
 
     /**
@@ -70,7 +71,7 @@ public class SearchService {
      * @param listDoc
      * @return
      */
-    private List<TranslatorsEntity> makeDocumenetsToTransotrsList( ArrayList<BookApiVO.Documents> listDoc ) {
+    private List<TranslatorsEntity> makeDocumenetsToTransotrsList( ArrayList<BookApiVO.Documents> listDoc, ArrayList <BookEntity> litBook  ) {
         ArrayList<TranslatorsEntity> listTranstors = new ArrayList<TranslatorsEntity>();
         for (int i = 1; i < listDoc.size(); i++) {
             List<String> listTrans = listDoc.get(i).getTranslators();
@@ -80,6 +81,7 @@ public class SearchService {
                             .id((long) i)
                             .title(listDoc.get(i).getTitle())
                             .translator(transtor)
+//                            .book(litBook.get(i))
                             .build()
                     );
                 }
@@ -93,7 +95,8 @@ public class SearchService {
      * @param listDoc
      * @return
      */
-    private List<AuthorsEntity> makeDocumenetsToAuthorsList( ArrayList<BookApiVO.Documents> listDoc ) {
+    private List<AuthorsEntity> makeDocumenetsToAuthorsList( ArrayList<BookApiVO.Documents> listDoc, ArrayList <BookEntity> listBook ) {
+
         ArrayList<AuthorsEntity> listAuthors = new ArrayList<AuthorsEntity>();
         for (int i = 1; i < listDoc.size(); i++) {
             List<String> listAuth = listDoc.get(i).getAuthors();
@@ -103,6 +106,7 @@ public class SearchService {
                             .id((long) i)
                             .title(listDoc.get(i).getTitle())
                             .author(author)
+//                            .book(listBook.get(i-1))
                             .build()
                     );
                 }
@@ -117,6 +121,17 @@ public class SearchService {
     public  ResponseEntity<List<?>> fildAllBooksByTitle(String title) {
 
         List<BookEntity> listBooks = bookRepository.findAllByTitle(title);
+
+
+        if(listBooks.size() == 0){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(new String[]{"데이터 없음."}));
+        }
+        return ResponseEntity.status(200).body(listBooks);
+    }
+    public  ResponseEntity<List<?>> fildAllBooksById(String book_id) {
+
+        List<BookEntity> listBooks = bookRepository.findAllById(Long.parseLong(book_id)) ;
+
 
         if(listBooks.size() == 0){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(new String[]{"데이터 없음."}));

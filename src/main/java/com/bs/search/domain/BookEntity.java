@@ -6,7 +6,7 @@ import lombok.*;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,7 +21,7 @@ import java.util.List;
 public class BookEntity {
 
     @Id // 해당 테이블의 PK 필드
-    @Column(name = "book_id")
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "title")
@@ -54,9 +54,30 @@ public class BookEntity {
     @Column(name = "status")
     private String status;
 
-    @OneToMany(mappedBy = "book")
-    private List<AuthorsEntity> authorsList;
+//  @OneToMany
+//    @JoinTable(name = "authors_book",
+//            joinColumns = @JoinColumn(name = "book_id"),
+//            inverseJoinColumns = @JoinColumn(name = "author_id"))
+//    private List<AuthorsEntity> authorsList =  new ArrayList<>();
+//
+//    @OneToMany
+//    @JoinTable(name = "translators_book",
+//            joinColumns = @JoinColumn(name = "book_id"),
+//            inverseJoinColumns = @JoinColumn(name = "author_id"))
+//    private List<TranslatorsEntity> translatorsList;
+//    @OneToMany(cascade =CascadeType.ALL, mappedBy = "book", fetch = FetchType.LAZY)
+//    private List<AuthorsEntity> authorsList =  new ArrayList<>();
 
-    @OneToMany(mappedBy = "book")
-    private List<TranslatorsEntity> translatorsList;
+
+
+    @OneToMany( fetch = FetchType.LAZY)
+    @JoinColumn(name="author_id")
+    private Set<AuthorsEntity> setAuthorEntitys;
+
+    @OneToMany( fetch = FetchType.LAZY)
+    @JoinColumn(name="trans_id")
+    private Set<TranslatorsEntity> translatorAuthorEntitys;
+
+//    @OneToMany(mappedBy = "book")
+//    private List<TranslatorsEntity> translatorsList;
 }
