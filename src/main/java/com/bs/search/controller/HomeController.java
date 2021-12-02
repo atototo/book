@@ -31,11 +31,14 @@ public class HomeController {
     @Autowired
     private PagingRepository pagingRepository;
 
+
     /**
-     * search 화면 접근
+     * methodName : helloWorld
+     * author : yelee
+     * description : 메인함수 이동
      *
      * @param model
-     * @return
+     * @return string
      */
     @GetMapping("/")
     public String helloWorld(Model model) {
@@ -46,12 +49,16 @@ public class HomeController {
 
 
     /**
-     * 타이틀로 조회 요청
+     * methodName : searchBookByTitle
+     * author : yelee
+     * description :
      *
      * @param title
+     * @param page     num
      * @param response
-     * @return
-     * @throws IOException
+     * @param pageable
+     * @return response entity
+     * @throws IOException the io exception
      */
     @GetMapping("/searchBookByTitle")
     @ResponseBody

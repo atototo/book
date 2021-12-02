@@ -5,6 +5,7 @@ import com.bs.search.vo.BookApi;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+
 @Mapper
 public interface DocumentsMapper {
     DocumentsMapper INSTANCE = Mappers.getMapper(DocumentsMapper.class);
