@@ -16,7 +16,7 @@ import java.util.List;
 @ToString
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DocumentsDto {
+public class Documents {
     private String title;
     private String contents;
     private String url;

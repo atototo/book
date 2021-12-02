@@ -1,7 +1,7 @@
 package com.bs.search.mapper;
 
 import com.bs.search.domain.BookEntity;
-import com.bs.search.vo.BookApiVO;
+import com.bs.search.vo.BookApi;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DocumentsMapperTest {
 
-    private static BookApiVO.Documents documents;
+    private static BookApi.Documents documents;
 
     void setTestData() {
         List<String> listAuthors = new ArrayList<>();
@@ -26,7 +26,7 @@ class DocumentsMapperTest {
 
 
 
-       documents = BookApiVO.Documents.builder()
+       documents = BookApi.Documents.builder()
                 .authors(listAuthors)
                 .contents("초콜릿의 달콤함뿐 아니라, 그 이면에 숨겨진 쌉싸래한 속살을 들춰보는『카카오』. 대중에게 사랑받는 기호식품 초콜릿과 그 원재료인 카카오 사이의 간극을 역사·인문·사회학적 관점에서 다루고 있다. 크게 식물 자체로서의 카카오와 재배 방법/ 카카오 재배농민의 현실과 공정무역/ 카카오의 기원과 메소아메리카 역사/ 유럽 초콜릿 문화사로 나뉜다. 시리즈의 특성답게 한 주제를 다각도로 조명했다는 점, 간결하고 편안한 글투로 흥미를 이끌어 낸다.")
                 .datetime("2014-08-11T00:00:00.000+09:00")
@@ -43,12 +43,12 @@ class DocumentsMapperTest {
     }
 
     @Test
-    @DisplayName("BookApiVO.Documnets to Entity TEST")
+    @DisplayName("BookApi.Documnets to Entity TEST")
     void test_documents_to_bookentity_event() {
         /* given */
         setTestData();
         /* when */
-        final BookEntity bookEntity = DocumentsMapper.INSTANCE.bookApiVOToEntity(documents, 1);
+        final BookEntity bookEntity = DocumentsMapper.INSTANCE.bookApiToEntity(documents, 1);
         /* then */
         assertNotNull(bookEntity);
         assertThat(bookEntity.getTitle()).isEqualTo("카카오(역사를 바꾼 물질 이야기 5)");

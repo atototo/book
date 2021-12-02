@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @NoArgsConstructor
-public class BookApiVO {
+public class BookApi {
 
     @JsonProperty("meta")
     private Meta meta;
@@ -23,6 +23,7 @@ public class BookApiVO {
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @NoArgsConstructor      //json
+    @Builder
     public static class Documents {
         private String url;
         private List<String> translators;

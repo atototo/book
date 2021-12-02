@@ -3,7 +3,7 @@ package com.bs.search.service;
 import com.bs.search.common.ApiEnum;
 import com.bs.search.domain.*;
 import com.bs.search.mapper.DocumentsMapper;
-import com.bs.search.vo.BookApiVO;
+import com.bs.search.vo.BookApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -45,9 +45,9 @@ public class SearchService {
         int reqApiCnt = totalCnt%reqMaxCnt> 0? (totalCnt / reqMaxCnt )+1 : (totalCnt / reqMaxCnt );
 
         // API RES Documents 부 추출
-        ArrayList<BookApiVO.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt).mapToObj(i -> (ArrayList<BookApiVO.Documents>) createUriCompnentAndExcute(i, reqMaxCnt).getBody().getDocuments()).flatMap(Collection::stream).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt).mapToObj(i -> (ArrayList<BookApi.Documents>) createUriCompnentAndExcute(i, reqMaxCnt).getBody().getDocuments()).flatMap(Collection::stream).collect(Collectors.toCollection(ArrayList::new));
         // API Documents BookEntity 관련 저장
-        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiVOToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new)));
+        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new)));
         // Documents AuthoEntity 관련 저장
         authorsRepository.saveAll(makeDocumenetsToAuthorsList(listDoc));
         // Documnets TranslaotrEntity 관련 저장
@@ -60,7 +60,7 @@ public class SearchService {
      * @param count
      * @return
      */
-    private ResponseEntity<BookApiVO> createUriCompnentAndExcute(int page, int count) {
+    private ResponseEntity<BookApi> createUriCompnentAndExcute(int page, int count) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, key);
         HttpEntity request = new HttpEntity(headers);
@@ -72,7 +72,7 @@ public class SearchService {
                 .queryParam("size", count)
                 .build();
 
-        return  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApiVO.class );
+        return  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class );
     }
 
     /**
@@ -80,7 +80,7 @@ public class SearchService {
      * @param listDoc
      * @return
      */
-    private List<TranslatorsEntity> makeDocumenetsToTransotrsList( ArrayList<BookApiVO.Documents> listDoc) {
+    private List<TranslatorsEntity> makeDocumenetsToTransotrsList( ArrayList<BookApi.Documents> listDoc) {
         ArrayList<TranslatorsEntity> listTranstors = new ArrayList<TranslatorsEntity>();
         for (int i = 1; i < listDoc.size(); i++) {
             List<String> listTrans = listDoc.get(i).getTranslators();
@@ -103,7 +103,7 @@ public class SearchService {
      * @param listDoc
      * @return
      */
-    private List<AuthorsEntity> makeDocumenetsToAuthorsList( ArrayList<BookApiVO.Documents> listDoc) {
+    private List<AuthorsEntity> makeDocumenetsToAuthorsList( ArrayList<BookApi.Documents> listDoc) {
 
         ArrayList<AuthorsEntity> listAuthors = new ArrayList<AuthorsEntity>();
         for (int i = 1; i < listDoc.size(); i++) {
