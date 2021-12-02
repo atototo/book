@@ -25,6 +25,8 @@ public class SearchService {
     private final BookRepository bookRepository;
     private final AuthorsEntityRepository authorsRepository;
     private final TranslatorsEntityRepository translatorsRepository;
+    private final PagingRepository pagingRepository;
+
 
     @Value("${api.uri}")
     private String bookApiUri;
@@ -87,7 +89,7 @@ public class SearchService {
             if (0 < listTrans.size()) {
                 for (String transtor : listTrans) {
                     listTranstors.add(TranslatorsEntity.builder()
-                            .id((long) i)
+                            .trans_id((long) i)
                             .title(listDoc.get(i).getTitle())
                             .translator(transtor)
                             .build()
@@ -111,7 +113,7 @@ public class SearchService {
             if (0 < listAuth.size()) {
                 for (String author : listAuth) {
                     listAuthors.add(AuthorsEntity.builder()
-                            .id((long) i)
+                            .author_id((long) i)
                             .title(listDoc.get(i).getTitle())
                             .author(author)
                             .build()

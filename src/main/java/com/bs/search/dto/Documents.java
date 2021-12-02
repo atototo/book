@@ -25,8 +25,8 @@ public class Documents {
     private List<AuthorsEntity> authors;
     private String publisher;
     private List<TranslatorsEntity> translators;
-    private int price;
-    private int salePrice;
+    private long price;
+    private long salePrice;
     private String thumbnail;
     private String status;
 

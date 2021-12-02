@@ -23,16 +23,15 @@ public class BookApi {
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @NoArgsConstructor      //json
-    @Builder
     public static class Documents {
         private String url;
         private List<String> translators;
         private String title;
         private String thumbnail;
         private String status;
-        private int salePrice;
+        private long salePrice;
         private String publisher;
-        private int price;
+        private long price;
         private String isbn;
         private String datetime;
         private String contents;
