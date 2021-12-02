@@ -21,6 +21,11 @@ public class HomeController {
     @Autowired
     private SearchService searchService;
 
+    /**
+     * search 화면 접근
+     * @param model
+     * @return
+     */
     @GetMapping("/")
     public String helloWorld(Model model){
         log.info("home controller");
@@ -29,16 +34,17 @@ public class HomeController {
     }
 
 
+    /**
+     * 타이틀로 조회 요청
+     * @param title
+     * @param response
+     * @return
+     * @throws IOException
+     */
     @GetMapping("/searchBookByTitle")
     @ResponseBody
     public ResponseEntity<List<?>> searchBookByTitle(@RequestParam String title, HttpServletResponse response) throws IOException {
         log.info("title  :: {}", title);
       return searchService.fildAllBooksByTitle(title);
-    }
-
-    @GetMapping("/searchBookByBookId")
-    @ResponseBody
-    public ResponseEntity<List<?>> searchBookByBookId(@RequestParam String title, HttpServletResponse response) throws IOException {
-      return searchService.fildAllBooksById(title);
     }
 }
