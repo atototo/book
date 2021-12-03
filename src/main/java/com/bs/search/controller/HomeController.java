@@ -44,7 +44,7 @@ public class HomeController {
     public String helloWorld(Model model) {
         log.info("home controller");
 
-        return "search";
+        return "search.html";
     }
 
 
@@ -62,7 +62,7 @@ public class HomeController {
      */
     @GetMapping("/searchBookByTitle")
     @ResponseBody
-    public ResponseEntity<Page<?>> searchBookByTitle(@RequestParam String title,@RequestParam String pageNum,  HttpServletResponse response
+    public ResponseEntity<Page<BookEntity>> searchBookByTitle(@RequestParam String title,@RequestParam String pageNum,  HttpServletResponse response
                                                     ,@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) throws IOException {
         log.info("title  :: {}", title);
 
@@ -71,17 +71,14 @@ public class HomeController {
         return ResponseEntity.status(200).body(blist);
     }
 
-
-
     @GetMapping("/searchBookByPrice")
     @ResponseBody
-    public  ResponseEntity<Page<?>> booksListByPrice(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+    public  ResponseEntity<Page<BookEntity>> booksListByPrice(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
 
                                               @RequestParam String min, @RequestParam String max,  @RequestParam String pageNum) {
        Pageable page = PageRequest.of(Integer.parseInt(pageNum), 10);
         Page<BookEntity> blist = pagingRepository.findAllByPriceBetween(Long.parseLong(min),Long.parseLong(max), page);
 
-        int pageNumber = blist.getPageable().getPageNumber(); //현재페이지
 
          return  ResponseEntity.status(200).body(blist);
     }

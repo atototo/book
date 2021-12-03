@@ -42,6 +42,7 @@ public class SearchService {
      * 카카오 키워드 조회 결과 정보 전체 저장 용도
      */
     public void saveDocumentsAll() {
+
         //한번에 최대 50개씩
         int totalCnt = createUriCompnentAndExcute(reqChkPageCnt, reqMaxCnt).getBody().getMeta().getPageableCount();
         int reqApiCnt = totalCnt%reqMaxCnt> 0? (totalCnt / reqMaxCnt )+1 : (totalCnt / reqMaxCnt );
@@ -157,4 +158,8 @@ public class SearchService {
         return ResponseEntity.status(200).body(listBooks);
 
     }
+
 }
+
+
+

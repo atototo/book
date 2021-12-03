@@ -8,6 +8,7 @@ public interface PagingRepository extends JpaRepository<BookEntity, Long> {
 
      Page<BookEntity> findAll(Pageable pageable);
      Page<BookEntity> findAllByTitle(String title, Pageable pageable);
+//     Page<BookEntity> findAllB
      Page<BookEntity> findAllByPriceBetween(long min,long max, Pageable pageable);
 
 }
