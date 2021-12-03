@@ -57,12 +57,12 @@
         function searchBooks(page) {
             searchKind = $("#searchKind option:selected").val();
 
-            var keyWord = "";
+            let keyWord = "";
 
             if ("bookTitle" == searchKind) {
                 keyWord = $("#searchTitle").val();
             } else {
-                var min = $("#searchPriceMin").val();
+                const min = $("#searchPriceMin").val();
                 var max = $("#searchPriceMax").val()
                 keyWord = "가격범위 ("+min +"~" + max+")";
             }
