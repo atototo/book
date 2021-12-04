@@ -8,9 +8,9 @@ import com.bs.search.dto.PageSearchDto;
 import com.bs.search.exception.BooksNotFoundException;
 import com.bs.search.mapper.DocumentsMapper;
 import com.bs.search.vo.BookApi;
+import com.bs.search.vo.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -33,6 +33,19 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+
+
+/**
+ * packageName : com.bs.search.service
+ * fileName : SearchService
+ * author : yelee
+ * date : 2021-12-04
+ * description : Application service 로직
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -41,20 +54,14 @@ public class SearchService {
     private final BookRepository bookRepository;
     private final AuthorsEntityRepository authorsRepository;
     private final TranslatorsEntityRepository translatorsRepository;
-    private final PagingRepository pagingRepository;
-    @Autowired
-    CacheManager cacheManager;
-
+    private final PagingBookRepository pagingRepository;
+    private final CacheManager cacheManager;
 
     @Value("${api.uri}")
     private String bookApiUri;
 
     @Value("${api.key}")
     private String key;
-
-    private static long idxCnt = 1;
-    private static int reqChkPageCnt = 5;
-    private static int reqMaxCnt = 50;
 
     /**
      * 카카오 키워드 조회 결과 정보 전체 저장 용도
@@ -63,21 +70,23 @@ public class SearchService {
 
         //한번에 최대 50개씩
 
-        var totalCnt = Objects.requireNonNull(createUriCompnentAndExcute(reqChkPageCnt, reqMaxCnt).getBody()).getMeta().getPageableCount();
+        var totalCnt = Objects.requireNonNull(createUriCompnentAndExcute(PageInfo.ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getMeta().getPageableCount();
+
+        PageInfo pageInfo = new PageInfo(totalCnt);
 
         // vo형식 ->> 페이저블 참고
-        int reqApiCnt = totalCnt%reqMaxCnt> 0? (totalCnt / reqMaxCnt )+1 : (totalCnt / reqMaxCnt );
+        int reqApiCnt = pageInfo.getReqApiCnt();
 
         // API RES Documents 부 추출
         ArrayList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
-                .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i, reqMaxCnt).getBody()).getDocuments())
+                .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i,  PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(ArrayList::new));
         // API Documents BookEntity 관련 저장
         bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new)));
-        // Documents AuthoEntity 관련 저장
+        // Documents AuthEntity 관련 저장
         authorsRepository.saveAll(makeDocumentsToAuthorsList(listDoc));
-        // Documnets TranslaotrEntity 관련 저장
+        // Documents TranslatorEntity 관련 저장
         translatorsRepository.saveAll(makeDocumentToTranslatorsList(listDoc));
 
 
@@ -170,12 +179,10 @@ public class SearchService {
      * @return  ResponseEntity<Page<BookEntity>>
      */
     public  Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
-        Pageable page = PageRequest.of(pageSearchDto.getPageNum(), 10);
+        Pageable page = PageRequest.of(pageSearchDto.getPageNum(),  PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
-        Page<BookEntity> blist = pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page)
-                .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
-
-        return blist;
+        return pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page)
+                                                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
     }
 
     /**
@@ -184,15 +191,14 @@ public class SearchService {
      * @return  ResponseEntity<Page<BookEntity>>
      */
     public Page<BookEntity> findAllBooksByPrice(PageSearchDto pageSearchDto) {
-        Pageable page = PageRequest.of(pageSearchDto.getPageNum(), 10);
+        Pageable page = PageRequest.of(pageSearchDto.getPageNum(), PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
-        Page<BookEntity> blist = pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page)
+        return pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page)
                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
-        return blist;
     }
 
     public static Object generate(PageSearchDto pageSearchDto) {
-        return pageSearchDto.getTitle() + "_" + pageSearchDto.getMinPrice()+"_"+ pageSearchDto.getMaxPrice();
+        return pageSearchDto.getTitle()+"_"+pageSearchDto.getPageNum() + "_" + pageSearchDto.getMinPrice()+"_"+ pageSearchDto.getMaxPrice();
     }
 
 }

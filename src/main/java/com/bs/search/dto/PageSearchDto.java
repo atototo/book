@@ -1,6 +1,5 @@
 package com.bs.search.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.validation.constraints.Max;
@@ -21,8 +20,9 @@ import javax.validation.constraints.NotBlank;
 @ToString
 @Getter
 @Setter
-@RequiredArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PageSearchDto {
 
     @NotBlank
@@ -39,4 +39,5 @@ public class PageSearchDto {
     private int minPrice;
     @Max(500000)
     private int maxPrice;
+
 }

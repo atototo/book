@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletRequest;
  * ===========================================================
  * DATE          AUTHOR          NOTE
  * -----------------------------------------------------------
- * 2021-12-04       isbn8         최초 생성
+ * 2021-12-04       yelee         최초 생성
  */
 @Slf4j
 @ControllerAdvice
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
    public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request){
       log.info("MethodArgumentNotValidException 발생!!! url:{}, trace:{}",request.getRequestURI(), e.getStackTrace());
       ErrorResponse errorResponse =  ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.UNMATCH_TYPE_VALUE.getDescription());
-      return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+      return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
    }
 
 }

@@ -24,7 +24,7 @@ function searchBooks(page) {
         url:"/searchBooks"
         , method : 'POST'
         , data : makeReqData(searchKind, page)
-        , contentType: "application/json; charset=UTF-8"
+        , contentType: "application/json"
         , success :  function(resp){
             console.log(resp);
             makeTable(resp);
@@ -90,7 +90,7 @@ function callPage(pageNum) {
     $.ajax({
         url:"/searchBooks"
         , data : makeReqData(searchKind, pageNum)
-        , contentType: "application/json; charset=UTF-8"
+        , contentType: "application/json"
         , method : 'POST'
         , success :  function(resp){
             makeTable(resp);

@@ -1,22 +1,30 @@
 package com.bs.search.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.util.Set;
 
-
+/**
+ * packageName : com.bs.search.domain
+ * fileName : AuthorsEntity
+ * author : yelee
+ * date : 2021-12-04
+ * description : 도서 정보 Entity
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false)
 @Entity
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "book")
 public class BookEntity implements Serializable {
 
@@ -25,6 +33,7 @@ public class BookEntity implements Serializable {
     @Column(name = "id")
     private Long id;
 
+    @NotEmpty
     @Column(name = "title")
     private String title;
 

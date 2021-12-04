@@ -15,11 +15,11 @@ import org.springframework.context.annotation.Configuration;
  * fileName : CacheConfig
  * author : yelee
  * date : 2021-12-04
- * description :
+ * description : cache 관련 설정
  * ===========================================================
  * DATE          AUTHOR          NOTE
  * -----------------------------------------------------------
- * 2021-12-04       isbn8         최초 생성
+ * 2021-12-04       yelee         최초 생성
  */
 @EnableCaching
 @Configuration

@@ -1,13 +1,14 @@
 package com.bs.search.controller;
 
 import com.bs.search.domain.BookEntity;
-import com.bs.search.domain.PagingRepository;
+import com.bs.search.domain.PagingBookRepository;
 import com.bs.search.dto.PageSearchDto;
 import com.bs.search.service.SearchService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,18 +19,28 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
 
+
+/**
+ * packageName : com.bs.search.controller
+ * fileName : SearchController
+ * author : yelee
+ * date : 2021-12-04
+ * description : 기본 컨트롤러
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Controller
 @Slf4j
-public class HomeController {
+@RequiredArgsConstructor
+public class SearchController {
 
-    @Autowired
-    private SearchService searchService;
+    private final SearchService searchService;
 
-    @Autowired
-    private PagingRepository pagingRepository;
+    private final PagingBookRepository pagingRepository;
 
-    @Autowired
-    CacheManager cacheManager;
+    private final CacheManager cacheManager;
 
     /**
      * methodName : helloWorld
@@ -46,7 +57,7 @@ public class HomeController {
         return "search.html";
     }
 
-    @PostMapping(value = "/searchBooks")
+    @PostMapping(value = "/searchBooks" , produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public  ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Valid PageSearchDto pageSearchDto) {
         long start = System.currentTimeMillis(); // 수행시간 측정

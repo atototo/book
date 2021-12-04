@@ -2,14 +2,17 @@ package com.bs.search.domain;
 
 import org.springframework.data.repository.CrudRepository;
 
-import java.util.List;
-import java.util.Optional;
-
+/**
+ * packageName : com.bs.search.domain
+ * fileName : BookRepository
+ * author : yelee
+ * date : 2021-12-04
+ * description : 도서 정보 repository
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 public interface BookRepository extends CrudRepository<BookEntity, Long> {
 
-    Optional<List<BookEntity>> findByTitleContaining(String name);
-
-    List<BookEntity> findAllByPriceBetween(long min, long max);
-
-    List<BookEntity> findAllById(Long id);
 }

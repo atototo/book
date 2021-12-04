@@ -1,23 +1,32 @@
 package com.bs.search.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
+/**
+ * packageName : com.bs.search.domain
+ * fileName : TranslatorsEntity
+ * author : yelee
+ * date : 2021-12-04
+ * description : 도서별 번역자 Entity
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false)
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "translators")
-public class TranslatorsEntity {
+public class TranslatorsEntity implements Serializable {
+
+    private static final long serialVersionUID = 7773096788157725424L;
 
     @Id // 해당 테이블의 PK 필드
     @GeneratedValue(strategy = GenerationType.IDENTITY) // PK생성규칙

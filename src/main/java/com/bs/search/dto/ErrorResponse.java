@@ -2,9 +2,12 @@ package com.bs.search.dto;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
+
+import java.io.Serializable;
 
 /**
  * packageName : com.bs.search.dto
@@ -17,9 +20,13 @@ import org.springframework.validation.FieldError;
  * -----------------------------------------------------------
  * 2021-12-04       yelee         최초 생성
  */
-@Data
+@Getter
+@Setter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ErrorResponse {
+public class ErrorResponse implements Serializable {
+
+    private static final long serialVersionUID = 6600165138863711638L;
+
     private int code;
     private String message;
 

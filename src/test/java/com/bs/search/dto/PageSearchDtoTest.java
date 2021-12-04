@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
  * 2021-12-03       isbn8         최초 생성
  */
 @Slf4j
-@DisplayName("PageSearchDtoTest 테스트")
 class PageSearchDtoTest {
 
     @BeforeEach
