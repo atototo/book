@@ -10,11 +10,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.validation.Valid;
 
 @Controller
 @Slf4j
@@ -23,11 +24,8 @@ public class HomeController {
     @Autowired
     private SearchService searchService;
 
-
     @Autowired
     private PagingRepository pagingRepository;
-    private Object ResponseEntity;
-
 
     /**
      * methodName : helloWorld
@@ -46,7 +44,7 @@ public class HomeController {
 
     @PostMapping(value = "/searchBooks")
     @ResponseBody
-    public  ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Validated PageSearchDto pageSearchDto) {
+    public  ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Valid PageSearchDto pageSearchDto) {
         return searchService.findAllByTarget(pageSearchDto);
     }
 }
