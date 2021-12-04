@@ -1,12 +1,8 @@
 package com.bs.search.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -16,16 +12,15 @@ import java.util.List;
 @NoArgsConstructor
 public class BookApi {
 
-    @JsonProperty("meta")
     private Meta meta;
-
-    @JsonProperty("documents")
     private List<Documents> documents;
 
     @Getter
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @AllArgsConstructor
     @NoArgsConstructor      //json
+    @Builder
     public static class Documents {
         private String url;
         private List<String> translators;

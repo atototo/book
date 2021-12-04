@@ -68,14 +68,20 @@
             }
             storeSearchField(keyWord);
 
-            var url =  makeReqUrl(searchKind, page);
-            var result;
-            var text = "빌런즈 오브 디즈니 기프트 세트"
             $.ajax({
-                url:url
-                , method : 'GET'
+                url:"/searchBooks"
+                , method : 'POST'
+                , data : makeReqData(searchKind, page)
+                , contentType: "application/json; charset=UTF-8"
                 , success :  function(resp){
+                    console.log(resp);
                     makeTable(resp);
+                }
+                , error : function (e) {
+                    console.log(e);
+                    const resData =JSON.parse(JSON.stringify(e));
+
+                    alert(resData.responseJSON.message);
                 }
             })
 
@@ -128,27 +134,40 @@
       }
 
       function callPage(pageNum) {
-          var url =  makeReqUrl(searchKind, pageNum);
-          var result;
+
           $.ajax({
-              url:url
-              , method : 'GET'
+              url:"/searchBooks"
+              , data : makeReqData(searchKind, pageNum)
+              , contentType: "application/json; charset=UTF-8"
+              , method : 'POST'
               , success :  function(resp){
                   makeTable(resp);
               }
           })
       }
 
-    function makeReqUrl(searchKind, page) {
-        var urlTitle ="/searchBookByTitle?"
-        var urlPrice ="/searchBookByPrice?"
+    function makeReqData(searchKind, page) {
+        let resData = "";
 
-        if ("bookTitle" == searchKind) {
-            urlTitle+= "title="+$("#searchTitle").val() + "&pageNum="+page;
-            return urlTitle;
+        // 리스트 생성
+        var dataList = new Array() ;
+        var PageSearchDto = new Object() ;
+
+        if ("bookTitle" === searchKind) {
+            PageSearchDto.cdSearch = searchKind;
+            PageSearchDto.title =  $("#searchTitle").val();
+            PageSearchDto.pageNum = parseInt(page);
+
+            console.log(JSON.stringify(PageSearchDto));
+            return JSON.stringify(PageSearchDto);
         } else {
-            urlPrice+= "min="+$("#searchPriceMin").val() +"&max="+$("#searchPriceMax").val()+"&pageNum="+page;
-            return urlPrice;
+            PageSearchDto.cdSearch = searchKind;
+            PageSearchDto.minPrice =  $("#searchPriceMin").val();
+            PageSearchDto.maxPrice =  $("#searchPriceMax").val();
+            PageSearchDto.pageNum = parseInt(page);
+
+            console.log(JSON.stringify(PageSearchDto));
+            return JSON.stringify(PageSearchDto);
         }
 
     }

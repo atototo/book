@@ -41,7 +41,7 @@ spring:
 
 logging:
   level:
-    com.bs.search: INFO
+    com.bs.search: DEBUG
 
 
 # log설정
