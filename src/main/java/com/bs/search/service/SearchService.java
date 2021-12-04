@@ -10,7 +10,9 @@ import com.bs.search.mapper.DocumentsMapper;
 import com.bs.search.vo.BookApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +26,10 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,6 +42,8 @@ public class SearchService {
     private final AuthorsEntityRepository authorsRepository;
     private final TranslatorsEntityRepository translatorsRepository;
     private final PagingRepository pagingRepository;
+    @Autowired
+    CacheManager cacheManager;
 
 
     @Value("${api.uri}")
@@ -145,13 +152,15 @@ public class SearchService {
      * @param pageSearchDto
      * @return
      */
-    public ResponseEntity<Page<BookEntity>> findAllByTarget(PageSearchDto pageSearchDto) {
-        ResponseEntity<Page<BookEntity>> response = null;
+    @Cacheable(value = "search", key = "T(com.bs.search.service.SearchService).generate(#pageSearchDto)")
+    public Page<BookEntity> findAllByTarget(PageSearchDto pageSearchDto) {
+        Page<BookEntity> response = null;
         if (PageSearchEnum.SEARCH_BY_TITLE.getValue().equals(pageSearchDto.getCdSearch())) {
             response = findAllByTitleLike(pageSearchDto);
         } else {
             response = findAllBooksByPrice(pageSearchDto);
         }
+         log.info("cache :: {}" ,  cacheManager.getCache("search").getNativeCache().toString());
         return response;
     }
 
@@ -160,13 +169,13 @@ public class SearchService {
      * @param pageSearchDto
      * @return  ResponseEntity<Page<BookEntity>>
      */
-    @Cacheable(value = "product", key="#pageSearchDto.title")
-    public  ResponseEntity<Page<BookEntity>> findAllByTitleLike(PageSearchDto pageSearchDto) {
+    public  Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(), 10);
 
         Page<BookEntity> blist = pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page)
                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
-        return ResponseEntity.status(200).body(blist);
+
+        return blist;
     }
 
     /**
@@ -174,13 +183,16 @@ public class SearchService {
      * @param pageSearchDto
      * @return  ResponseEntity<Page<BookEntity>>
      */
-    @Cacheable(value = "product", key= "#pageSearchDto.minPrice.toString().concat(:).concat(#PageSerchDto.maxPrice)")
-    public  ResponseEntity<Page<BookEntity>> findAllBooksByPrice(PageSearchDto pageSearchDto) {
+    public Page<BookEntity> findAllBooksByPrice(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(), 10);
 
         Page<BookEntity> blist = pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page)
                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
-        return ResponseEntity.status(200).body(blist);
+        return blist;
+    }
+
+    public static Object generate(PageSearchDto pageSearchDto) {
+        return pageSearchDto.getTitle() + "_" + pageSearchDto.getMinPrice()+"_"+ pageSearchDto.getMaxPrice();
     }
 
 }

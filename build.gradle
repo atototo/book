@@ -44,7 +44,11 @@ dependencies {
 	annotationProcessor "org.projectlombok:lombok:1.18.16"
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
-
+gradle.projectsEvaluated {
+	tasks.withType(JavaCompile){
+		options.compilerArgs << "-Xlint:deprecation"
+	}
+}
 test {
 	useJUnitPlatform()
 }

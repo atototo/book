@@ -1,6 +1,8 @@
 package com.bs.search.service;
 
 import com.bs.search.domain.PagingRepository;
+import com.bs.search.dto.PageSearchDto;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,12 +20,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * -----------------------------------------------------------
  * 2021-12-04       isbn8         최초 생성
  */
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class SearchServiceTest {
     @InjectMocks
     private SearchService searchService;
     @Mock
     private PagingRepository pagingRepository;
+
+    private PageSearchDto pageSearchDto;
+
+
 
     @Test
     void saveDocumentsAll() {
@@ -35,12 +42,11 @@ class SearchServiceTest {
 
     @Test
     void findAllBooksByTitle() {
-//        PageSearchDto pageSearchDto = PageSearchDto.builder()
-//                                                    .title("카카오")
-//                                                    .build();
 
-
-//        when(pagingRepository.findAllByTitleLike(new StringJoiner(pageSearchDto.getTitle(), "%", "%").toString(), 0))
+        pageSearchDto = new PageSearchDto();
+        pageSearchDto.setTitle("카카오");
+//
+//        when(pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), 0)
 //                             .thenReturn(Optional.empty());
 //
 //        ResponseEntity<Page<BookEntity>> list = searchService.findAllBooksByTitle(new StringJoiner(pageSearchDto.getTitle(), "%", "%").toString(), 0);
@@ -49,7 +55,4 @@ class SearchServiceTest {
 
     }
 
-    @Test
-    void findAllBooksByPrice() {
-    }
 }

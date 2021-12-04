@@ -6,6 +6,7 @@ import com.bs.search.dto.PageSearchDto;
 import com.bs.search.service.SearchService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,9 @@ public class HomeController {
     @Autowired
     private PagingRepository pagingRepository;
 
+    @Autowired
+    CacheManager cacheManager;
+
     /**
      * methodName : helloWorld
      * author : yelee
@@ -45,6 +49,11 @@ public class HomeController {
     @PostMapping(value = "/searchBooks")
     @ResponseBody
     public  ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Valid PageSearchDto pageSearchDto) {
-        return searchService.findAllByTarget(pageSearchDto);
+        long start = System.currentTimeMillis(); // 수행시간 측정
+
+       Page<BookEntity> response = searchService.findAllByTarget(pageSearchDto);
+        long end = System.currentTimeMillis();
+        log.info("{},  수행시간 , : {} ms",pageSearchDto.getTitle(),(end-start) );
+        return  ResponseEntity.status(200).body(response);
     }
 }

@@ -20,6 +20,7 @@ import javax.validation.constraints.NotBlank;
  */
 @ToString
 @Getter
+@Setter
 @RequiredArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PageSearchDto {

@@ -3,10 +3,11 @@ package com.bs.search.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Set;
+
 
 @Getter
 @Setter
@@ -15,11 +16,11 @@ import java.util.Set;
 @Builder
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "book")
-public class BookEntity {
+public class BookEntity implements Serializable {
 
+    private static final long serialVersionUID = -6664369969831285247L;
     @Id // 해당 테이블의 PK 필드
     @Column(name = "id")
     private Long id;
