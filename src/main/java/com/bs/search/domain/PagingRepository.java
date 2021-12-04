@@ -9,7 +9,8 @@ import java.util.Optional;
 public interface PagingRepository extends JpaRepository<BookEntity, Long> {
 
      Page<BookEntity> findAll(Pageable pageable);
-     Optional<Page<BookEntity>> findAllByTitleLike(String title, Pageable pageable);
+//     Optional<Page<BookEntity>> findAllByTitleLike(String title, Pageable pageable);
+     Optional<Page<BookEntity>> findByTitleContaining(String title, Pageable pageable);
      Optional<Page<BookEntity>> findAllByPriceBetween(long min,long max, Pageable pageable);
 
 

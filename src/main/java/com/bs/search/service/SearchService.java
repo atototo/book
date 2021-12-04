@@ -11,6 +11,7 @@ import com.bs.search.vo.BookApi;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -159,10 +160,11 @@ public class SearchService {
      * @param pageSearchDto
      * @return  ResponseEntity<Page<BookEntity>>
      */
+    @Cacheable(value = "product", key="#pageSearchDto.title")
     public  ResponseEntity<Page<BookEntity>> findAllByTitleLike(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(), 10);
 
-        Page<BookEntity> blist = pagingRepository.findAllByTitleLike(new StringJoiner(pageSearchDto.getTitle(), "%", "%").toString(), page)
+        Page<BookEntity> blist = pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page)
                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
         return ResponseEntity.status(200).body(blist);
     }
@@ -172,6 +174,7 @@ public class SearchService {
      * @param pageSearchDto
      * @return  ResponseEntity<Page<BookEntity>>
      */
+    @Cacheable(value = "product", key= "#pageSearchDto.minPrice.toString().concat(:).concat(#PageSerchDto.maxPrice)")
     public  ResponseEntity<Page<BookEntity>> findAllBooksByPrice(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(), 10);
 

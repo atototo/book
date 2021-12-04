@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd"
+         updateCheck="false">
+
+<cache name="search"
+        maxEntriesLocalHeap="5000"
+        eternal="false"
+        timeToIdleSeconds="0"
+        timeToLiveSeconds="30"
+        maxEntriesLocalDisk="0"
+        overflowToDisk="false"
+        statistics="true"
+        memoryStoreEvictionPolicy="LRU"
+        transactionalMode="off"
+/>
+</ehcache>
+<!--        eternal: ?? Cache ?? ?? (true ??? timeToIdleSeconds, timeToLiveSeconds ??? ???-->
+<!--#timeToLiveSeconds:??????????? ????. (0=???? ???)-->
+<!--        logging: ?? ?? ??? ????.-->
