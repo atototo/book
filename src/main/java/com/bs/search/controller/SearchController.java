@@ -47,7 +47,7 @@ public class SearchController {
      * @return string
      */
     @GetMapping("/")
-    public String helloWorld(Model model) {
+    public String searchHome(Model model) {
         log.info("home controller");
 
         return "search.html";

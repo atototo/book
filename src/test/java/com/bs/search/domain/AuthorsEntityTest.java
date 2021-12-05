@@ -25,7 +25,7 @@ class AuthorsEntityTest {
         long id = 0;
 
         AuthorsEntity authorsEntity = AuthorsEntity.builder()
-                .author_id(null)
+                .authorId(null)
                 .title("카카오")
                 .id(1L)
                 .author("조희수")

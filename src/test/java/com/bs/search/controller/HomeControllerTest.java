@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(SearchController.class)
-public class HomeControllerTest {
+class HomeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -49,7 +49,7 @@ public class HomeControllerTest {
 
     @Test
     @DisplayName("메인 페이지 접속 테스트")
-    public void test_hello_world() throws Exception {
+     void test_hello_world() throws Exception {
         /* when */
         final ResultActions resultAction = mockMvc.perform(get("/"));
 
@@ -61,7 +61,7 @@ public class HomeControllerTest {
 
     @Test
     @DisplayName("책 조회 파라미터 확인 유효하지 않으면 INVALID_BODY 란 메시지와 함께 status code 400을 리턴한다.")
-    public void test_searth_books() throws Exception{
+     void test_searth_books() throws Exception{
         //given
         PageSearchDto pageSearchDto = PageSearchDto.builder()
                                                     .pageNum(0)
@@ -79,7 +79,7 @@ public class HomeControllerTest {
 
     @Test
     @DisplayName("검색 테스트")
-    public void test_search() throws Exception {
+     void test_search() throws Exception {
         /* given */
         List<String> listAuthors = new ArrayList<>();
         listAuthors.add("안드레아 더리");

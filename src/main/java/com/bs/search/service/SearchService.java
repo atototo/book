@@ -96,7 +96,7 @@ public class SearchService {
     private ResponseEntity<BookApi> createUriCompnentAndExcute(int page, int count) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, key);
-        HttpEntity request = new HttpEntity(headers);
+        HttpEntity<?> request = new HttpEntity(headers);
 
         UriComponents uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
                 .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
@@ -153,7 +153,7 @@ public class SearchService {
      * @param pageSearchDto
      * @return
      */
-    @Cacheable(value = "search", key = "T(com.bs.search.service.SearchService).generate(#pageSearchDto)")
+    @Cacheable(value = "search", key = "T(com.bs.search.service.SearchService).makeKey(#pageSearchDto)")
     public Page<BookEntity> findAllByTarget(PageSearchDto pageSearchDto) {
         Page<BookEntity> response = null;
         if (PageSearchEnum.SEARCH_BY_TITLE.getValue().equals(pageSearchDto.getCdSearch())) {
@@ -161,7 +161,6 @@ public class SearchService {
         } else {
             response = findAllBooksByPrice(pageSearchDto);
         }
-         log.info("cache :: {}" ,  cacheManager.getCache("search").getNativeCache().toString());
         return response;
     }
 
@@ -195,7 +194,7 @@ public class SearchService {
         return response;
     }
 
-    public static Object generate(PageSearchDto pageSearchDto) {
+    public static String makeKey(PageSearchDto pageSearchDto) {
         return pageSearchDto.getTitle()+"_"+pageSearchDto.getPageNum() + "_" + pageSearchDto.getMinPrice()+"_"+ pageSearchDto.getMaxPrice();
     }
 
