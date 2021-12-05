@@ -34,7 +34,7 @@ public class AuthorsEntity implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "author_id")
+    @Column(name = "authorId")
     private Long authorId;
 
     @Column(name = "title")

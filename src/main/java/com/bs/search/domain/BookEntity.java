@@ -65,11 +65,11 @@ public class BookEntity implements Serializable {
     private String status;
 
     @OneToMany( fetch = FetchType.LAZY)
-    @JoinColumn(name="author_id")
-    private Set<AuthorsEntity> setAuthorEntitys;
+    @JoinColumn(name="authorId")
+    private Set<AuthorsEntity> authorsEntities;
 
     @OneToMany( fetch = FetchType.LAZY)
-    @JoinColumn(name="trans_id")
-    private Set<TranslatorsEntity> translatorAuthorEntitys;
+    @JoinColumn(name="transId")
+    private Set<TranslatorsEntity> translatorsEntities;
 
 }

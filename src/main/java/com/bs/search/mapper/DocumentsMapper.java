@@ -24,5 +24,4 @@ public interface DocumentsMapper {
 
     BookEntity bookApiToEntity(BookApi.Documents documentsVO, long id);
 
-
 }

@@ -1,33 +1,32 @@
 package com.bs.search.service;
 
 import com.bs.search.common.ApiEnum;
-import com.bs.search.domain.BookEntity;
-import com.bs.search.domain.BookRepository;
+import com.bs.search.domain.*;
 import com.bs.search.mapper.DocumentsMapper;
 import com.bs.search.vo.BookApi;
 import com.bs.search.vo.PageInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -52,6 +51,12 @@ class SearchServiceApiTest {
 
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private AuthorsEntityRepository authorsRepository;
+    @Autowired
+    private TranslatorsEntityRepository translatorsRepository;
+    @Autowired
+    private PagingBookRepository pagingBookRepository;
 
 
     @Value("${api.uri}")
@@ -62,6 +67,7 @@ class SearchServiceApiTest {
 
     private int totalCount;
     private UriComponents uri;
+    private  HttpHeaders headers;
 
     @Test
     @DisplayName("API 요청이 잘 되는지 확인")
@@ -69,8 +75,6 @@ class SearchServiceApiTest {
         //given
         int page = 5;
         int count = 10;
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, key);
         HttpEntity<?> request = new HttpEntity(headers);
         makeUrl(page, count);
 
@@ -82,28 +86,13 @@ class SearchServiceApiTest {
                 () -> Assertions.assertThat(response.getStatusCodeValue()).hasToString("200"),
                 () -> Assertions.assertThat(Objects.requireNonNull(response.getBody()).getMeta().getTotalCount()).isPositive()
         );
-
-        if (HttpStatus.OK.equals(response.getStatusCode())) {
-            totalCount = response.getBody().getMeta().getTotalCount();
-            System.out.println("totalCount :  " + totalCount);
-        }
-
     }
 
-    /**
-     * 요청 Uri 생성 용도
-     * @param page
-     * @param count
-     */
-    void makeUrl(int page, int count) {
 
-         uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
-                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
-                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
-                .queryParam("page",  page)
-                .queryParam("size", count)
-                .build();
-
+    @BeforeEach
+    void setHeaders() {
+        headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, key);
     }
 
     @Test
@@ -113,9 +102,6 @@ class SearchServiceApiTest {
         //given
         PageInfo pageInfo = new PageInfo(342);
         int reqApiCnt = pageInfo.getReqApiCnt();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, key);
         HttpEntity<?> request = new HttpEntity(headers);
 
 
@@ -142,8 +128,6 @@ class SearchServiceApiTest {
     void checkTitleName() {
         //given
         makeUrl(1, 1);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, key);
         HttpEntity<?> request = new HttpEntity(headers);
 
         //when
@@ -157,5 +141,95 @@ class SearchServiceApiTest {
 
     }
 
+    @Test
+    @DisplayName("단건조회하여 같은 키값으로 도서,저자,번역 테이블에 각각 잘 저장 되는지확인")
+    void saveDocumentsAll() {
+        //given 단건만 조회되는 타이틀로 API 호출
+        var title = "Go Go 카카오프렌즈. 1: 프랑스(윈터 에디션)";
+        ResponseEntity<BookApi> response =  uriForSaveAll(title);
+        LinkedList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, 1).mapToObj(i1 -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(response.getBody()).getDocuments())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(LinkedList::new));
 
+        //when : 각각 join 되어 있는 테이블에 저장
+        // API Documents BookEntity 관련 저장
+        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i - 1), i)).collect(Collectors.toCollection(ArrayList::new)));
+        // Documents AuthEntity 관련 저장
+        authorsRepository.saveAll(Objects.requireNonNull(ReflectionTestUtils.invokeMethod(searchService, "makeDocumentsToAuthorsList", listDoc)));
+        // Documents TranslatorEntity 관련 저장
+        translatorsRepository.saveAll(Objects.requireNonNull(ReflectionTestUtils.invokeMethod(searchService, "makeDocumentToTranslatorsList", listDoc)));
+
+        Pageable page = PageRequest.of(0, PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
+        Page<BookEntity> listBookEntity = pagingBookRepository.findByTitleContaining(title, page);
+
+        //Then
+        //1. 도서정보 테이블에 저장 확인
+        assertEquals(title, listBookEntity.getContent().get(0).getTitle());
+        //2. 동일한 ID 값으로 불러온 저자정보 도서명 일치 확인
+        Optional<AuthorsEntity> listAuthors = authorsRepository.findById(1L);
+        if (listAuthors.isPresent()) {
+            System.out.println(listAuthors.toString());
+            listAuthors.ifPresent(a -> {
+                System.out.println(a.getAuthor());
+                assertEquals(title, a.getTitle());
+            });
+        }
+        //3. 동일한 ID 값으로 불러온 번역도서명 일치 확인
+        Optional<TranslatorsEntity> listTranslators = translatorsRepository.findById(1L);
+        if (listTranslators.isPresent()) {
+            listTranslators.ifPresent(a -> {
+                System.out.println(a.getTranslator());
+                assertEquals(title, a.getTitle());
+            });
+        }
+    }
+
+    /**
+     * 요청 Uri 생성 용도
+     * @param page
+     * @param count
+     */
+    void makeUrl(int page, int count) {
+
+        uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
+                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
+                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
+                .queryParam("page",  page)
+                .queryParam("size", count)
+                .build();
+
+    }
+
+    /**
+     * 타이틀 별개로 호출용도 API 통신 메소드
+     * @param title
+     * @return
+     */
+    ResponseEntity<BookApi> uriForSaveAll(String title) {
+        HttpEntity<?> request = new HttpEntity(headers);
+
+        //uri 직접 지정 필요
+        uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
+                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
+                .queryParam(ApiEnum.QUERY_KEY.getValue(), title)
+                .build();
+
+        ResponseEntity<BookApi> response = restTemplate.exchange(uri.toUri(), HttpMethod.GET, request, BookApi.class);
+        int cnt = Objects.requireNonNull(response.getBody()).getMeta().getTotalCount();
+
+        return response;
+    }
+
+    @Test
+    void findAllByTarget() {
+    }
+
+
+    @Test
+    void findAllByTitleLike() {
+    }
+
+    @Test
+    void findAllBooksByPrice() {
+    }
 }

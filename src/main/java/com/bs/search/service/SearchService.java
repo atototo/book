@@ -26,10 +26,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -74,10 +71,11 @@ public class SearchService {
         int reqApiCnt = pageInfo.getReqApiCnt();
 
         // API RES Documents 부 추출
-        ArrayList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
+        Collection<BookApi.Documents> list = IntStream.rangeClosed(1, reqApiCnt)
                 .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i,  PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(ArrayList::new));
+        LinkedList<BookApi.Documents> listDoc = new LinkedList<>(list);
         // API Documents BookEntity 관련 저장
         bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i-1), i)).collect(Collectors.toCollection(ArrayList::new)));
         // Documents AuthEntity 관련 저장
@@ -110,14 +108,14 @@ public class SearchService {
     /**
      * translator entity 추출
      */
-    private List<TranslatorsEntity> makeDocumentToTranslatorsList(ArrayList<BookApi.Documents> listDoc) {
+    private List<TranslatorsEntity> makeDocumentToTranslatorsList(LinkedList<BookApi.Documents> listDoc) {
         ArrayList<TranslatorsEntity> listTranslators = new ArrayList<>();
-        IntStream.range(1, listDoc.size()).forEach(i -> {
+        IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
             List<String> listTrans = listDoc.get(i-1).getTranslators();
             if (!listTrans.isEmpty()) listTrans.stream()
                     .map(translator -> TranslatorsEntity.builder()
                             .transId((long) i)
-                            .title(listDoc.get(i).getTitle())
+                            .title(listDoc.get(i-1).getTitle())
                             .translator(translator)
                             .build())
                     .forEach(listTranslators::add);
@@ -129,7 +127,7 @@ public class SearchService {
      * authors entity 추출
      * @return
      */
-    private List<AuthorsEntity> makeDocumentsToAuthorsList(ArrayList<BookApi.Documents> listDoc) {
+    private List<AuthorsEntity> makeDocumentsToAuthorsList(LinkedList<BookApi.Documents> listDoc) {
 
         ArrayList<AuthorsEntity> listAuthors = new ArrayList<>();
         IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
@@ -138,7 +136,7 @@ public class SearchService {
                 listAuth.stream()
                         .map(author -> AuthorsEntity.builder()
                                 .authorId((long) i)
-                                .title(listDoc.get(i).getTitle())
+                                .title(listDoc.get(i-1).getTitle())
                                 .author(author).build()
                         )
                         .forEach(listAuthors::add);

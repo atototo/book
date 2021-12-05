@@ -43,4 +43,6 @@ class PageSearchDtoTest {
 //        assertThat(dto.getPageNum()).isEqualTo(pageNum);
 
     }
+
+    //book타이틀로 조회 했을 때 해당 책의 저작권자와 번역자가 같이 나와야 됨  이게 제일 관건
 }

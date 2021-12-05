@@ -33,7 +33,7 @@ public class TranslatorsEntity implements Serializable {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="trans_id")
+    @Column(name="transId")
     private Long transId;
 
     @Column(name = "title")
