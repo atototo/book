@@ -181,8 +181,12 @@ public class SearchService {
     public  Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(),  PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
-        return pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page)
-                                                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
+        Page<BookEntity> response = pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page);
+
+        if (response.hasContent()) {
+            throw new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription());
+        }
+        return response;
     }
 
     /**
@@ -193,8 +197,12 @@ public class SearchService {
     public Page<BookEntity> findAllBooksByPrice(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(), PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
-        return pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page)
-                .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
+        Page<BookEntity> response = pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page);
+
+        if (response.hasContent()) {
+            throw new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription());
+        }
+        return response;
     }
 
     public static Object generate(PageSearchDto pageSearchDto) {
