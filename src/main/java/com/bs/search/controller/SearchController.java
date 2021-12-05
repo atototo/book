@@ -37,8 +37,6 @@ import javax.validation.Valid;
 public class SearchController {
 
     private final SearchService searchService;
-    private final PagingBookRepository pagingRepository;
-    private final CacheManager cacheManager;
 
     /**
      * methodName : helloWorld
