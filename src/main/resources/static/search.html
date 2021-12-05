@@ -45,11 +45,10 @@
                 <p>도서명 또는 정가 금액으로 검색 가능 합니다</p>
             </blockquote>
             <div id="listSearched">
-<!--                <span class="badge rounded-pill bg-primary">Primary</span>-->
             </div>
             <br/>
             <form>
-                <fieldset >
+                <legend>
                     <div class="form-group">
                         <label for="searchKind">검색구분</label>
                         <select id="searchKind" class="form-control" onchange="chgSearchForm(this.value)">
@@ -70,16 +69,15 @@
                     </div>
 
                     <button type="button" onclick="searchBooks('0')" class="btn btn-primary">조회</button>
-<!--                    <button type="button" onclick="storeSearchField()" class="btn btn-primary">넣어</button>-->
-<!--                    <button type="button" onclick="localStorageFind()" class="btn btn-primary">스토리지 조회</button>-->
                     <button type="button" onclick="window.location.reload()" class="btn btn-primary">reset</button>
-                </fieldset>
+                </legend>
                 <span id="resResult"></span>
             </form>
             <br />
             <div id="list">
                 <!-- 테이블 속성 정의 -->
                 <table class="table">
+                    <caption>카카오 API 도서 목록</caption>
                     <thead class="thead-dark">
                     <tr>
                         <th scope="col">도서 고유번호</th>
@@ -91,13 +89,9 @@
                     </tbody>
                 </table>
 
-
                 <!-- 페이징 속성 정의 -->
                 <nav aria-label="Page navigation example">
                     <ul id="dyn_ul" class="pagination" style="justify-content: center;">
-<!--                         <li class="page-item"><a class="page-link" href="#">Previous</a></li>-->
-<!--                        <li class="page-item"><a class="page-link" href="#">1</a></li>-->
-<!--                        <li class="page-item"><a class="page-link" href="#">Next</a></li>-->
                     </ul>
                 </nav>
 

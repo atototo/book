@@ -177,7 +177,7 @@ public class SearchService {
 
         Page<BookEntity> response = pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page);
 
-        if (response.hasContent()) {
+        if (!response.hasContent()) {
             throw new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription());
         }
         return response;
@@ -192,7 +192,7 @@ public class SearchService {
 
         Page<BookEntity> response = pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page);
 
-        if (response.hasContent()) {
+        if (!response.hasContent()) {
             throw new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription());
         }
         return response;

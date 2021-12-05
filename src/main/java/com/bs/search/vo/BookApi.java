@@ -26,6 +26,7 @@ import java.util.List;
 public class BookApi implements Serializable {
 
     private static final long serialVersionUID = 8623971911951535024L;
+
     private Meta meta;
     private List<Documents> documents;
 
@@ -36,6 +37,8 @@ public class BookApi implements Serializable {
     @NoArgsConstructor      //json
     @Builder
     public static class Documents {
+
+
         private String url;
         private List<String> translators;
         private String title;
