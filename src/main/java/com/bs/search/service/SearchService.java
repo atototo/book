@@ -55,7 +55,6 @@ public class SearchService {
     private final AuthorsEntityRepository authorsRepository;
     private final TranslatorsEntityRepository translatorsRepository;
     private final PagingBookRepository pagingRepository;
-    private final CacheManager cacheManager;
 
     @Value("${api.uri}")
     private String bookApiUri;
