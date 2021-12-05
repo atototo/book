@@ -3,7 +3,7 @@ package com.bs.search.common;
 import lombok.Getter;
 
 /**
- * packageName : com.bs.search.commonㅎ
+ * packageName : com.bs.search.common
  * fileName : ErrorEnum
  * author : yelee
  * date : 2021-12-04

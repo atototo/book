@@ -37,10 +37,7 @@ public class RestTemplateConfig {
                                                 //각 호스트(IP와 Port의 조합)당 커넥션 풀에 생성가능한 커넥션 수
         factory.setHttpClient(httpClient);
 
-        RestTemplate restTemplate = new RestTemplate(factory);
-        // apache HttpClient를 사용해 request 생성
-        // RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
-        return restTemplate;
+        return new RestTemplate(factory);
     }
 
 

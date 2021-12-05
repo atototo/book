@@ -94,8 +94,6 @@ public class SearchService {
 
     /**
      * API 호출
-     * @param page
-     * @param count
      * @return
      */
     private ResponseEntity<BookApi> createUriCompnentAndExcute(int page, int count) {
@@ -115,8 +113,6 @@ public class SearchService {
 
     /**
      * translator entity 추출
-     * @param listDoc
-     * @return
      */
     private List<TranslatorsEntity> makeDocumentToTranslatorsList(ArrayList<BookApi.Documents> listDoc) {
         ArrayList<TranslatorsEntity> listTranslators = new ArrayList<>();
@@ -134,8 +130,7 @@ public class SearchService {
     }
 
     /**
-     * authors enttiy 추출
-     * @param listDoc
+     * authors entity 추출
      * @return
      */
     private List<AuthorsEntity> makeDocumentsToAuthorsList(ArrayList<BookApi.Documents> listDoc) {
@@ -175,7 +170,6 @@ public class SearchService {
 
     /**
      * 도서 타이틀로 조회한다
-     * @param pageSearchDto
      * @return  ResponseEntity<Page<BookEntity>>
      */
     public  Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
@@ -190,8 +184,7 @@ public class SearchService {
     }
 
     /**
-     * 금액으로 조회한다
-     * @param pageSearchDto
+     * 금액으로 조회한다.
      * @return  ResponseEntity<Page<BookEntity>>
      */
     public Page<BookEntity> findAllBooksByPrice(PageSearchDto pageSearchDto) {
