@@ -28,8 +28,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * packageName : com.bs.search.service
@@ -137,6 +136,26 @@ class SearchServiceApiTest {
        assertEquals(listDoc.size(), listBook.size());
     }
 
+
+    @Test
+    @DisplayName("카카오 키워드가 포함된 항목이 잘 조회 되었는지 확인")
+    void checkTitleName() {
+        //given
+        makeUrl(1, 1);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, key);
+        HttpEntity<?> request = new HttpEntity(headers);
+
+        //when
+        ResponseEntity<BookApi>  response =  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class);
+
+        //then
+        assertAll(
+                () ->   assertNotNull(response.getBody()),
+                () ->   assertTrue(Objects.requireNonNull(response.getBody()).getDocuments().get(0).getTitle().contains("카카오"))
+        );
+
+    }
 
 
 }
