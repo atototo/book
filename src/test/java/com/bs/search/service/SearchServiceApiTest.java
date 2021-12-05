@@ -10,10 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
@@ -51,6 +48,9 @@ class SearchServiceApiTest {
     @Value("${api.key}")
     private String key;
 
+    private int totalCount;
+    private UriComponents uri;
+
     @Test
     @DisplayName("API 요청이 잘 되는지 확인")
     void reqApi(){
@@ -60,13 +60,7 @@ class SearchServiceApiTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, key);
         HttpEntity<?> request = new HttpEntity(headers);
-
-        UriComponents uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
-                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
-                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
-                .queryParam("page",  page)
-                .queryParam("size", count)
-                .build();
+        makeUrl(page, count);
 
         //when
         ResponseEntity<BookApi>  response =  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class);
@@ -77,7 +71,30 @@ class SearchServiceApiTest {
                 () -> Assertions.assertThat(Objects.requireNonNull(response.getBody()).getMeta().getTotalCount()).isPositive()
         );
 
+        if (HttpStatus.OK.equals(response.getStatusCode())) {
+            totalCount = response.getBody().getMeta().getTotalCount();
+            System.out.println("totalCount :  " + totalCount);
+        }
+
     }
+
+    /**
+     * 요청 Uri 생성 용도
+     * @param page
+     * @param count
+     */
+    void makeUrl(int page, int count) {
+
+         uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
+                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
+                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
+                .queryParam("page",  page)
+                .queryParam("size", count)
+                .build();
+
+    }
+
+
 
 
 }
