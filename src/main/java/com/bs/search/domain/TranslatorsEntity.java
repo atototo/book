@@ -34,11 +34,10 @@ public class TranslatorsEntity implements Serializable {
     private Long id;
 
     @Column(name="trans_id")
-    private Long trans_id;
+    private Long transId;
 
     @Column(name = "title")
     private String title;
-
 
     @Column(name = "translators")
     private String translator;

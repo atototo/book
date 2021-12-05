@@ -85,17 +85,13 @@ class PagingRepositoryTest {
         Pageable page = (Pageable) PageRequest.of(0, 10);
 
 
-
-        Optional<Page<BookEntity>> listBook = pagingRepository.findByTitleContaining(title, (Pageable) page);
-        listBook.orElseThrow(()->  new IllegalArgumentException("리스트가 이 존재하지 않습니다."));
+        Page<BookEntity> listBook = pagingRepository.findByTitleContaining(title, (Pageable) page);
+        if (listBook == null) throw new NullPointerException();
         assertNotNull(listBook);
-        System.out.println(listBook.get().getContent());
-        listBook.ifPresent(
-                a -> a.getContent().stream().forEach(s ->{
+        Optional.of(listBook).ifPresent(
+                a -> a.getContent().forEach(s -> {
 //                    assertThat(s.getTitle().contains("선물")).isFalse();
                     assertTrue("같아", s.getTitle().contains("선물"));
-                    System.out.println("같음같음");
-                    System.out.println("11111111111111111111111111111111111111");
                 })
         );
 

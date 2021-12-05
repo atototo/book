@@ -14,6 +14,4 @@ import org.springframework.data.repository.CrudRepository;
  * 2021-12-04       yelee         최초 생성
  */
 public interface TranslatorsEntityRepository extends CrudRepository<TranslatorsEntity, Long> {
-
-
 }

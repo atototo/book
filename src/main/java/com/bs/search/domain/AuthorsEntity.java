@@ -30,12 +30,12 @@ public class AuthorsEntity implements Serializable {
     private static final long serialVersionUID = 6789430517440297295L;
 
     @Id // 해당 테이블의 PK 필드
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // PK생성규칙
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
     @Column(name = "author_id")
-    private Long author_id;
+    private Long authorId;
 
     @Column(name = "title")
     private String title;

@@ -69,12 +69,9 @@ public class SearchService {
     public void saveDocumentsAll() {
 
         //한번에 최대 50개씩
-
         var totalCnt = Objects.requireNonNull(createUriCompnentAndExcute(PageInfo.ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getMeta().getPageableCount();
 
         PageInfo pageInfo = new PageInfo(totalCnt);
-
-        // vo형식 ->> 페이저블 참고
         int reqApiCnt = pageInfo.getReqApiCnt();
 
         // API RES Documents 부 추출
@@ -120,7 +117,7 @@ public class SearchService {
             List<String> listTrans = listDoc.get(i).getTranslators();
             if (!listTrans.isEmpty()) listTrans.stream()
                     .map(translator -> TranslatorsEntity.builder()
-                            .trans_id((long) i)
+                            .transId((long) i)
                             .title(listDoc.get(i).getTitle())
                             .translator(translator)
                             .build())
@@ -141,7 +138,7 @@ public class SearchService {
             if (!listAuth.isEmpty()) {
                 listAuth.stream()
                         .map(author -> AuthorsEntity.builder()
-                                .author_id((long) i)
+                                .authorId((long) i)
                                 .title(listDoc.get(i).getTitle())
                                 .author(author).build()
                         )

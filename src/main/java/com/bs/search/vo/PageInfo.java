@@ -34,16 +34,18 @@ public class PageInfo implements Serializable {
         this.totalCnt = totalCnt;
     }
 
+    //요청회수 리턴용도
     public int getReqApiCnt() {
         return  this.totalCnt%reqMaxCnt> 0? (this.totalCnt / reqMaxCnt )+1 : (this.totalCnt / reqMaxCnt );
     }
 
+    //조회 기본 값
     public enum ChkCnt {
         REQ_CHK_PAGE_CNT(5),
         REQ_MAX_CNT(50),
         REQ_DEFAULT_PAGE_SIZE(10);
 
-        private int cnt;
+        private final int cnt;
 
         ChkCnt(int cnt) {
             this.cnt = cnt;
