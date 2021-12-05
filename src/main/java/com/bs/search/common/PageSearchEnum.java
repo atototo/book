@@ -1,26 +1,24 @@
 package com.bs.search.common;
 
 /**
- * packageName : com.bs.search.common=
- * fileName : ApiEnum
+ * packageName : com.bs.search.common
+ * fileName : PageSearchEnum
  * author : yelee
  * date : 2021-12-04
- * description : API 관련 기본 설정 값 정의
+ * description : search 조건항목 정의
  * ===========================================================
  * DATE          AUTHOR          NOTE
  * -----------------------------------------------------------
  * 2021-12-04       yelee         최초 생성
  */
-public enum ApiEnum {
+public enum PageSearchEnum {
 
-    TARGET_KEY("target"),
-    TARGET_VALUE("title"),
-    QUERY_KEY("query"),
-    QUERY_VALUE("카카오");
+    SEARCH_BY_TITLE("bookTitle"),
+    SEARCH_BY_PRICE_BETWEEN("bookPrice");
 
     private final String value;
 
-    ApiEnum(String value) {
+    PageSearchEnum(String value) {
         this.value = value;
     }
 

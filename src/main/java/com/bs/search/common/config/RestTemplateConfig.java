@@ -8,6 +8,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
+
+/**
+ * packageName : com.bs.search.common.config
+ * fileName : RestTemplateConfig
+ * author : yelee
+ * date : 2021-12-04
+ * description : restTemplate 설정
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Configuration
 public class RestTemplateConfig {
     @Bean

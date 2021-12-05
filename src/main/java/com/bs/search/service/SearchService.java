@@ -1,22 +1,51 @@
 package com.bs.search.service;
 
 import com.bs.search.common.ApiEnum;
+import com.bs.search.common.ErrorCode;
+import com.bs.search.common.PageSearchEnum;
 import com.bs.search.domain.*;
+import com.bs.search.dto.PageSearchDto;
+import com.bs.search.exception.BooksNotFoundException;
 import com.bs.search.mapper.DocumentsMapper;
 import com.bs.search.vo.BookApi;
+import com.bs.search.vo.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+
+
+/**
+ * packageName : com.bs.search.service
+ * fileName : SearchService
+ * author : yelee
+ * date : 2021-12-04
+ * description : Application service 로직
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -25,8 +54,8 @@ public class SearchService {
     private final BookRepository bookRepository;
     private final AuthorsEntityRepository authorsRepository;
     private final TranslatorsEntityRepository translatorsRepository;
-    private final PagingRepository pagingRepository;
-
+    private final PagingBookRepository pagingRepository;
+    private final CacheManager cacheManager;
 
     @Value("${api.uri}")
     private String bookApiUri;
@@ -34,27 +63,33 @@ public class SearchService {
     @Value("${api.key}")
     private String key;
 
-    private static long idxCnt = 1;
-    private static int reqChkPageCnt = 5;
-    private static int reqMaxCnt = 50;
-
     /**
      * 카카오 키워드 조회 결과 정보 전체 저장 용도
      */
     public void saveDocumentsAll() {
 
         //한번에 최대 50개씩
-        int totalCnt = createUriCompnentAndExcute(reqChkPageCnt, reqMaxCnt).getBody().getMeta().getPageableCount();
-        int reqApiCnt = totalCnt%reqMaxCnt> 0? (totalCnt / reqMaxCnt )+1 : (totalCnt / reqMaxCnt );
+
+        var totalCnt = Objects.requireNonNull(createUriCompnentAndExcute(PageInfo.ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getMeta().getPageableCount();
+
+        PageInfo pageInfo = new PageInfo(totalCnt);
+
+        // vo형식 ->> 페이저블 참고
+        int reqApiCnt = pageInfo.getReqApiCnt();
 
         // API RES Documents 부 추출
-        ArrayList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt).mapToObj(i -> (ArrayList<BookApi.Documents>) createUriCompnentAndExcute(i, reqMaxCnt).getBody().getDocuments()).flatMap(Collection::stream).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
+                .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i,  PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toCollection(ArrayList::new));
         // API Documents BookEntity 관련 저장
         bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new)));
-        // Documents AuthoEntity 관련 저장
-        authorsRepository.saveAll(makeDocumenetsToAuthorsList(listDoc));
-        // Documnets TranslaotrEntity 관련 저장
-        translatorsRepository.saveAll(makeDocumenetsToTransotrsList(listDoc));
+        // Documents AuthEntity 관련 저장
+        authorsRepository.saveAll(makeDocumentsToAuthorsList(listDoc));
+        // Documents TranslatorEntity 관련 저장
+        translatorsRepository.saveAll(makeDocumentToTranslatorsList(listDoc));
+
+
     }
 
     /**
@@ -75,7 +110,7 @@ public class SearchService {
                 .queryParam("size", count)
                 .build();
 
-        return  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class );
+        return  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class);
     }
 
     /**
@@ -83,22 +118,19 @@ public class SearchService {
      * @param listDoc
      * @return
      */
-    private List<TranslatorsEntity> makeDocumenetsToTransotrsList( ArrayList<BookApi.Documents> listDoc) {
-        ArrayList<TranslatorsEntity> listTranstors = new ArrayList<TranslatorsEntity>();
-        for (int i = 1; i < listDoc.size(); i++) {
+    private List<TranslatorsEntity> makeDocumentToTranslatorsList(ArrayList<BookApi.Documents> listDoc) {
+        ArrayList<TranslatorsEntity> listTranslators = new ArrayList<>();
+        IntStream.range(1, listDoc.size()).forEach(i -> {
             List<String> listTrans = listDoc.get(i).getTranslators();
-            if (0 < listTrans.size()) {
-                for (String transtor : listTrans) {
-                    listTranstors.add(TranslatorsEntity.builder()
+            if (!listTrans.isEmpty()) listTrans.stream()
+                    .map(translator -> TranslatorsEntity.builder()
                             .trans_id((long) i)
                             .title(listDoc.get(i).getTitle())
-                            .translator(transtor)
-                            .build()
-                    );
-                }
-            }
-        }
-        return listTranstors;
+                            .translator(translator)
+                            .build())
+                    .forEach(listTranslators::add);
+        });
+        return listTranslators;
     }
 
     /**
@@ -106,57 +138,67 @@ public class SearchService {
      * @param listDoc
      * @return
      */
-    private List<AuthorsEntity> makeDocumenetsToAuthorsList( ArrayList<BookApi.Documents> listDoc) {
+    private List<AuthorsEntity> makeDocumentsToAuthorsList(ArrayList<BookApi.Documents> listDoc) {
 
-        ArrayList<AuthorsEntity> listAuthors = new ArrayList<AuthorsEntity>();
-        for (int i = 1; i < listDoc.size(); i++) {
+        ArrayList<AuthorsEntity> listAuthors = new ArrayList<>();
+        IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
             List<String> listAuth = listDoc.get(i).getAuthors();
-            if (0 < listAuth.size()) {
-                for (String author : listAuth) {
-                    listAuthors.add(AuthorsEntity.builder()
-                            .author_id((long) i)
-                            .title(listDoc.get(i).getTitle())
-                            .author(author)
-                            .build()
-                    );
-                }
+            if (!listAuth.isEmpty()) {
+                listAuth.stream()
+                        .map(author -> AuthorsEntity.builder()
+                                .author_id((long) i)
+                                .title(listDoc.get(i).getTitle())
+                                .author(author).build()
+                        )
+                        .forEach(listAuthors::add);
             }
-        }
+        });
         return listAuthors;
     }
-    public List findAll() {
-        return Collections.singletonList(bookRepository.findAll());
+
+    /**
+     * 조회구분에따라 분기 하여 조회한다
+     * @param pageSearchDto
+     * @return
+     */
+    @Cacheable(value = "search", key = "T(com.bs.search.service.SearchService).generate(#pageSearchDto)")
+    public Page<BookEntity> findAllByTarget(PageSearchDto pageSearchDto) {
+        Page<BookEntity> response = null;
+        if (PageSearchEnum.SEARCH_BY_TITLE.getValue().equals(pageSearchDto.getCdSearch())) {
+            response = findAllByTitleLike(pageSearchDto);
+        } else {
+            response = findAllBooksByPrice(pageSearchDto);
+        }
+         log.info("cache :: {}" ,  cacheManager.getCache("search").getNativeCache().toString());
+        return response;
     }
 
     /**
-     * 도서 타이틀로 조회
-     * @param title
-     * @return
+     * 도서 타이틀로 조회한다
+     * @param pageSearchDto
+     * @return  ResponseEntity<Page<BookEntity>>
      */
-    public  ResponseEntity<List<?>> fildAllBooksByTitle(String title) {
+    public  Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
+        Pageable page = PageRequest.of(pageSearchDto.getPageNum(),  PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
-        List<BookEntity> listBooks = bookRepository.findAllByTitle(title);
-
-        if(listBooks.size() == 0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(new String[]{"데이터 없음."}));
-        }
-        return ResponseEntity.status(200).body(listBooks);
+        return pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page)
+                                                 .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
     }
 
     /**
-     * 정가금액 범위로 도서 검색
-     * @param min
-     * @param max
-     * @return
+     * 금액으로 조회한다
+     * @param pageSearchDto
+     * @return  ResponseEntity<Page<BookEntity>>
      */
-    public ResponseEntity<List<?>> fidAllBooksByPrice(long min, long max) {
-        List<BookEntity> listBooks =  bookRepository.findAllByPriceBetween(min,max);
+    public Page<BookEntity> findAllBooksByPrice(PageSearchDto pageSearchDto) {
+        Pageable page = PageRequest.of(pageSearchDto.getPageNum(), PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
-        if(listBooks.size() == 0){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Arrays.asList(new String[]{"데이터 없음."}));
-        }
-        return ResponseEntity.status(200).body(listBooks);
+        return pagingRepository.findAllByPriceBetween(pageSearchDto.getMinPrice(), pageSearchDto.getMaxPrice(), page)
+                .orElseThrow(() -> new BooksNotFoundException(ErrorCode.NOT_FOND.getDescription()));
+    }
 
+    public static Object generate(PageSearchDto pageSearchDto) {
+        return pageSearchDto.getTitle()+"_"+pageSearchDto.getPageNum() + "_" + pageSearchDto.getMinPrice()+"_"+ pageSearchDto.getMaxPrice();
     }
 
 }

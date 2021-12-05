@@ -1,29 +1,39 @@
 package com.bs.search.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 import java.util.Set;
 
+/**
+ * packageName : com.bs.search.domain
+ * fileName : AuthorsEntity
+ * author : yelee
+ * date : 2021-12-04
+ * description : 도서 정보 Entity
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(callSuper = false)
 @Entity
-@EntityListeners(AuditingEntityListener.class)
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Table(name = "book")
-public class BookEntity {
+public class BookEntity implements Serializable {
 
+    private static final long serialVersionUID = -6664369969831285247L;
     @Id // 해당 테이블의 PK 필드
     @Column(name = "id")
     private Long id;
 
+    @NotEmpty
     @Column(name = "title")
     private String title;
 

@@ -1,31 +1,40 @@
 package com.bs.search.vo;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
+import java.io.Serializable;
 import java.util.List;
 
+
+/**
+ * packageName : com.bs.search.vo
+ * fileName : BookApi
+ * author : yelee
+ * date : 2021-12-04
+ * description :BookApi 조회 시 바로 매핑 되는 VO
+ * ===========================================================
+ * DATE          AUTHOR          NOTE
+ * -----------------------------------------------------------
+ * 2021-12-04       yelee         최초 생성
+ */
 @Getter
 @Setter
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @NoArgsConstructor
-public class BookApi {
+public class BookApi implements Serializable {
 
-    @JsonProperty("meta")
+    private static final long serialVersionUID = 8623971911951535024L;
     private Meta meta;
-
-    @JsonProperty("documents")
     private List<Documents> documents;
 
     @Getter
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+    @AllArgsConstructor
     @NoArgsConstructor      //json
+    @Builder
     public static class Documents {
         private String url;
         private List<String> translators;
