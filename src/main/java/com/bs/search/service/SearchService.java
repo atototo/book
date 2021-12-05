@@ -79,7 +79,7 @@ public class SearchService {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toCollection(ArrayList::new));
         // API Documents BookEntity 관련 저장
-        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()-1).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i), i)).collect(Collectors.toCollection(ArrayList::new)));
+        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i-1), i)).collect(Collectors.toCollection(ArrayList::new)));
         // Documents AuthEntity 관련 저장
         authorsRepository.saveAll(makeDocumentsToAuthorsList(listDoc));
         // Documents TranslatorEntity 관련 저장
@@ -113,7 +113,7 @@ public class SearchService {
     private List<TranslatorsEntity> makeDocumentToTranslatorsList(ArrayList<BookApi.Documents> listDoc) {
         ArrayList<TranslatorsEntity> listTranslators = new ArrayList<>();
         IntStream.range(1, listDoc.size()).forEach(i -> {
-            List<String> listTrans = listDoc.get(i).getTranslators();
+            List<String> listTrans = listDoc.get(i-1).getTranslators();
             if (!listTrans.isEmpty()) listTrans.stream()
                     .map(translator -> TranslatorsEntity.builder()
                             .transId((long) i)
@@ -133,7 +133,7 @@ public class SearchService {
 
         ArrayList<AuthorsEntity> listAuthors = new ArrayList<>();
         IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
-            List<String> listAuth = listDoc.get(i).getAuthors();
+            List<String> listAuth = listDoc.get(i-1).getAuthors();
             if (!listAuth.isEmpty()) {
                 listAuth.stream()
                         .map(author -> AuthorsEntity.builder()
