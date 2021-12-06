@@ -21,10 +21,10 @@
 
 
 
-##Build with 
+## Build with 
 `Gradle`
 
-##Deply with
+## Deply with
 `Docker`
 
 <hr/>
