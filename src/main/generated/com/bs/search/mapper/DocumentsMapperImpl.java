@@ -7,7 +7,7 @@ import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2021-12-06T17:35:38+0900",
+    date = "2021-12-06T18:33:48+0900",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 11.0.12 (Oracle Corporation)"
 )
 public class DocumentsMapperImpl implements DocumentsMapper {

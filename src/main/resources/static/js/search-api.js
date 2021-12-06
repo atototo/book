@@ -69,8 +69,10 @@ function searchBooks(page) {
             return false;
         }
 
+        console.log(min);
+        console.log(max);
         //조회 금액 체크 : 최소금액이 최대금액보다 같거나 클경우
-        if(min >= max) {
+        if( parseInt(min )>=  parseInt(max)) {
             alert("최소금액은 최대금액보다 클 수 없습니다.");
             return false;
         }
