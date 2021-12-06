@@ -19,8 +19,8 @@ class DocumentsMapperTest {
 
 
     @Test
-    @DisplayName("BookApi.Documnets to Entity TEST")
-    void test_documents_to_bookentity_event() {
+    @DisplayName("API조회 결과를 Entity 형식에 맞도록 잘 변환 시키는지 확인")
+    void test_documents_to_bookending_event() {
         /* given */
         setTestData();
         /* when */

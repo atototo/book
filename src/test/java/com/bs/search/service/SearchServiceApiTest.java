@@ -219,34 +219,4 @@ class SearchServiceApiTest {
         return response;
     }
 
-    @Test
-    void findAllByTarget() {
-    }
-
-
-    @Test
-    @DisplayName("")
-    void findAllByTitleLike() {
-        //given
-        PageSearchDto pageSearchDto = PageSearchDto.builder()
-                .title("프렌즈")
-                .pageNum(0)
-                .pageSize(10)
-                .build();
-
-        //when
-        Page<BookEntity> response = searchService.findAllBooksByPrice(pageSearchDto);
-
-        //then
-        assertTrue(response.hasContent());
-        response.getContent().forEach(r ->{
-            assertTrue(r.getTitle().contains("프렌즈"));
-        });
-
-    }
-
-
-    @Test
-    void findAllBooksByPrice() {
-    }
 }
