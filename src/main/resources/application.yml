@@ -2,7 +2,7 @@
 server:
   port: 8080
 
-#http://localhost:8080/h2-console
+
 spring:
   h2:
     console:
@@ -31,20 +31,10 @@ spring:
       hbm2ddl:
         auto: none
 
-# 로그레벨의 설정  쿼리 및 결과의 로그 출력 레벨 조정이 가능
-#logging:
-#  level:
-#    org:
-#      hibernate:
-#        type: trace
-#    com.bs.search: INFO
-
 logging:
   level:
     com.bs.search: INFO
 
-
-# log설정
 log:
   pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%X{identity}] %msg %n"
   appender: console
