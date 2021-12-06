@@ -36,12 +36,12 @@ function searchBooks(page) {
 
         //조회 금액 체크 : 둘다 입력 안됬을경우
         if (min === "0" && max === "0") {
-            alert("최소 금액을 입력해주세요");
+            alert("금액을 입력해주세요");
             return false;
         }
 
         //조회 금액 체크 : 최소금액 안됬을경우
-        if (max === "0" || !max) {
+        if (min === "0" || !min) {
             alert("최소 금액을 입력해주세요");
             return false;
         }

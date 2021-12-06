@@ -1,13 +1,11 @@
 package com.bs.search.domain;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -51,7 +49,7 @@ class BookRepositoryTest {
 
     @Test
     @DisplayName("조회된 도서 정보 저장 확인 테스트")
-    void saveAll(){
+    void saveAll() {
         //given, when
         makeData();
 
@@ -72,10 +70,10 @@ class BookRepositoryTest {
 
         // when
         BookEntity book = BookEntity.builder()
-                                .id(id)
-                                .isbn("test isbn")
-                                .title("kakao")
-                                .build();
+                .id(id)
+                .isbn("test isbn")
+                .title("kakao")
+                .build();
 
         assertThatThrownBy(() -> bookRepository.save(book))
                 .isInstanceOf(IllegalArgumentException.class)

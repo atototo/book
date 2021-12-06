@@ -1,12 +1,10 @@
 package com.bs.search.controller;
 
 import com.bs.search.domain.BookEntity;
-import com.bs.search.domain.PagingBookRepository;
 import com.bs.search.dto.PageSearchDto;
 import com.bs.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -39,28 +37,30 @@ public class SearchController {
     private final SearchService searchService;
 
     /**
-     * methodName : helloWorld
+     * methodName : searchHome
      * author : yelee
-     * description : 메인함수 이동
+     * description : 메인페이지 이동
      *
      * @param model
      * @return string
      */
     @GetMapping("/")
     public String searchHome(Model model) {
-        log.info("home controller");
-
         return "search.html";
     }
 
-    @PostMapping(value = "/searchBooks" , produces = MediaType.APPLICATION_JSON_VALUE)
+    /**
+     * methodName : booksListByTarget
+     * author : yelee
+     * description : 조건에 따른 도서목록 조회
+     *
+     * @param pageSearchDto
+     * @return
+     */
+    @PostMapping(value = "/searchBooks", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public  ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Valid PageSearchDto pageSearchDto) {
-        long start = System.currentTimeMillis(); // 수행시간 측정
-
-       Page<BookEntity> response = searchService.findAllByTarget(pageSearchDto);
-        long end = System.currentTimeMillis();
-        log.info("{},  수행시간 , : {} ms",pageSearchDto.getTitle(),(end-start) );
-        return  ResponseEntity.status(200).body(response);
+    public ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Valid PageSearchDto pageSearchDto) {
+        Page<BookEntity> response = searchService.findAllByTarget(pageSearchDto);
+        return ResponseEntity.status(200).body(response);
     }
 }

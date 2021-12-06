@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -48,10 +47,7 @@ class SearchServiceTest {
         when(pagingBookRepository.findByTitleContaining(eq("프렌즈"), any(Pageable.class)))
                 .thenReturn(new PageImpl<>(Lists.newArrayList(BookEntity.builder().title("카카오 프렌즈 1").build())));
 
-
-        Page<BookEntity> response = searchService.findAllByTitleLike( mockPageDto(10000, 20000, 0, 10));
-
-//        Page<BookEntity> response = pagingBookRepository.findByTitleContaining("프렌즈", PageRequest.of(0,10));
+        Page<BookEntity> response = searchService.findAllByTitleLike(mockPageDto(10000, 20000, 0, 10));
 
         assertThat(response.getNumberOfElements()).isEqualTo(1);
         assertThat(response.getContent().get(0).getTitle()).isEqualTo("카카오 프렌즈 1");
@@ -59,10 +55,8 @@ class SearchServiceTest {
     }
 
     private PageSearchDto mockPageDto(long min, long max, int pageNum, int pageSize) {
-        MockitoAnnotations.openMocks(this);
         return PageSearchDto.builder().title("프렌즈").minPrice(min).maxPrice(max).pageNum(pageNum).pageSize(pageSize).build();
     }
-
 
 
 }

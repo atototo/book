@@ -28,8 +28,8 @@ public class TranslatorsEntity implements Serializable {
 
     private static final long serialVersionUID = 7773096788157725424L;
 
-    @Id // 해당 테이블의 PK 필드
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // PK생성규칙
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 

@@ -30,7 +30,6 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
  * -----------------------------------------------------------
  * 2021-12-05       yelee         최초 생성
  */
-@Slf4j
 @SpringBootTest
 class PagingRepositoryTest {
 
@@ -97,8 +96,4 @@ class PagingRepositoryTest {
 
     }
 
-    //금액 범위로 조회가 잘 되는지 (초과금액으로 테스트?)
-
-
-    //페이징이 잘 되는지 조회
 }

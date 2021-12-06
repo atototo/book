@@ -12,7 +12,6 @@ import com.bs.search.vo.PageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +28,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
 
 
 /**
@@ -59,8 +57,13 @@ public class SearchService {
     @Value("${api.key}")
     private String key;
 
+
     /**
-     * 카카오 키워드 조회 결과 정보 전체 저장 용도
+     * methodName : searchHome
+     * author : yelee
+     * description : API 카카오 키워드 조회하여 모두 저장
+     *
+     * @void
      */
     public void saveDocumentsAll() {
 
@@ -70,12 +73,12 @@ public class SearchService {
         PageInfo pageInfo = new PageInfo(totalCnt);
         int reqApiCnt = pageInfo.getReqApiCnt();
 
-        // API RES Documents 부 추출
+        // API RES Documents 부분 추출
         LinkedList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
                 .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i, PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
                 .flatMap(Collection::stream).collect(Collectors.toCollection(LinkedList::new));
         // API Documents BookEntity 관련 저장
-        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i-1), i)).collect(Collectors.toCollection(ArrayList::new)));
+        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i - 1), i)).collect(Collectors.toCollection(ArrayList::new)));
         // Documents AuthEntity 관련 저장
         authorsRepository.saveAll(makeDocumentsToAuthorsList(listDoc));
         // Documents TranslatorEntity 관련 저장
@@ -85,8 +88,13 @@ public class SearchService {
     }
 
     /**
-     * API 호출
-     * @return
+     * methodName : createUriCompnentAndExcute
+     * author : yelee
+     * description : API 요청 메소드
+     *
+     * @param page
+     * @param count
+     * @return ResponseEntity<BookApi>
      */
     private ResponseEntity<BookApi> createUriCompnentAndExcute(int page, int count) {
         HttpHeaders headers = new HttpHeaders();
@@ -96,24 +104,29 @@ public class SearchService {
         UriComponents uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
                 .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
                 .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
-                .queryParam("page",  page)
+                .queryParam("page", page)
                 .queryParam("size", count)
                 .build();
 
-        return  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class);
+        return restTemplate.exchange(uri.toUri(), HttpMethod.GET, request, BookApi.class);
     }
 
     /**
-     * translator entity 추출
+     * methodName : makeDocumentToTranslatorsList
+     * author : yelee
+     * description :API response documents 부분 중 translator 추출
+     *
+     * @param listDoc
+     * @return List<TranslatorsEntity
      */
     private List<TranslatorsEntity> makeDocumentToTranslatorsList(LinkedList<BookApi.Documents> listDoc) {
         ArrayList<TranslatorsEntity> listTranslators = new ArrayList<>();
         IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
-            List<String> listTrans = listDoc.get(i-1).getTranslators();
+            List<String> listTrans = listDoc.get(i - 1).getTranslators();
             if (!listTrans.isEmpty()) listTrans.stream()
                     .map(translator -> TranslatorsEntity.builder()
                             .transId((long) i)
-                            .title(listDoc.get(i-1).getTitle())
+                            .title(listDoc.get(i - 1).getTitle())
                             .translator(translator)
                             .build())
                     .forEach(listTranslators::add);
@@ -122,19 +135,23 @@ public class SearchService {
     }
 
     /**
-     * authors entity 추출
-     * @return
+     * methodName : makeDocumentsToAuthorsList
+     * author : yelee
+     * description : API response documents 부분 중 author 추출
+     *
+     * @param listDoc
+     * @return List<AuthorsEntity>
      */
     private List<AuthorsEntity> makeDocumentsToAuthorsList(LinkedList<BookApi.Documents> listDoc) {
 
         ArrayList<AuthorsEntity> listAuthors = new ArrayList<>();
         IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
-            List<String> listAuth = listDoc.get(i-1).getAuthors();
+            List<String> listAuth = listDoc.get(i - 1).getAuthors();
             if (!listAuth.isEmpty()) {
                 listAuth.stream()
                         .map(author -> AuthorsEntity.builder()
                                 .authorId((long) i)
-                                .title(listDoc.get(i-1).getTitle())
+                                .title(listDoc.get(i - 1).getTitle())
                                 .author(author).build()
                         )
                         .forEach(listAuthors::add);
@@ -144,9 +161,13 @@ public class SearchService {
     }
 
     /**
-     * 조회구분에따라 분기 하여 조회한다
+     * /**
+     * methodName : findAllByTarget
+     * author : yelee
+     * description : 조회구분에따라 필요 메소드 호출 메소드로 캐싱 처리
+     *
      * @param pageSearchDto
-     * @return
+     * @return Page<BookEntity>
      */
     @Cacheable(value = "search", key = "T(com.bs.search.service.SearchService).makeKey(#pageSearchDto)")
     public Page<BookEntity> findAllByTarget(PageSearchDto pageSearchDto) {
@@ -160,11 +181,15 @@ public class SearchService {
     }
 
     /**
-     * 도서 타이틀로 조회한다
-     * @return  ResponseEntity<Page<BookEntity>>
+     * methodName : findAllByTitleLike
+     * author : yelee
+     * description : 조회구분 타이틀의 경우 호출되는 메소드
+     *
+     * @param pageSearchDto
+     * @return Page<BookEntity>
      */
-    public  Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
-        Pageable page = PageRequest.of(pageSearchDto.getPageNum(),  PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
+    public Page<BookEntity> findAllByTitleLike(PageSearchDto pageSearchDto) {
+        Pageable page = PageRequest.of(pageSearchDto.getPageNum(), PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
 
         Page<BookEntity> response = pagingRepository.findByTitleContaining(pageSearchDto.getTitle(), page);
 
@@ -175,8 +200,12 @@ public class SearchService {
     }
 
     /**
-     * 금액으로 조회한다.
-     * @return  ResponseEntity<Page<BookEntity>>
+     * methodName : findAllBooksByPrice
+     * author : yelee
+     * description : 조회구분 가격범위의 경우 호출되는 메소드
+     *
+     * @param pageSearchDto
+     * @return response
      */
     public Page<BookEntity> findAllBooksByPrice(PageSearchDto pageSearchDto) {
         Pageable page = PageRequest.of(pageSearchDto.getPageNum(), PageInfo.ChkCnt.REQ_DEFAULT_PAGE_SIZE.getCnt());
@@ -189,8 +218,16 @@ public class SearchService {
         return response;
     }
 
+    /**
+     * methodName : makeKey
+     * author : yelee
+     * description : 캐시 키 생성 메소드 (title_pageNum_minPrice_maxPrice)
+     *
+     * @param pageSearchDto
+     * @return string
+     */
     public static String makeKey(PageSearchDto pageSearchDto) {
-        return pageSearchDto.getTitle()+"_"+pageSearchDto.getPageNum() + "_" + pageSearchDto.getMinPrice()+"_"+ pageSearchDto.getMaxPrice();
+        return pageSearchDto.getTitle() + "_" + pageSearchDto.getPageNum() + "_" + pageSearchDto.getMinPrice() + "_" + pageSearchDto.getMaxPrice();
     }
 
 }
