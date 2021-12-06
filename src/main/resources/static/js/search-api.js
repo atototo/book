@@ -1,3 +1,20 @@
+/**
+ * 도서명 입력후 엔터키 검색
+ * @param page
+ * @returns {boolean}
+ */
+$(document).ready(function(){
+
+    $("#searchTitle").keydown(function (key) {
+
+        if(key.keyCode === 13){//키가 13이면 실행 (엔터는 13)
+            searchBooks(0);
+        }
+
+    });
+
+});
+
 /* [테이블 리스트 전역 변수 선언 실시] */
 let tableList = []; // tableInsert 함수에서 for문을 돌면서 삽입 실시
 let pageList = 5; // 한개의 페이지에 보여질 목록 개수
@@ -72,9 +89,9 @@ function searchBooks(page) {
             //로컬 스토리지 검색어 저장 (-> 성공일 경우)
             storeSearchField(keyWord);
         }
-        , error : function (e) {
-            console.log(e);
-            const resData =JSON.parse(JSON.stringify(e));
+        , error: function (e) {
+            const resData = JSON.parse(JSON.stringify(e));
+            console.log(resData);
             alert(resData.responseJSON.message);
             noDataRow();
         }
@@ -151,7 +168,8 @@ function callPage(pageNum) {
         }
         , error : function (e) {
             console.log(e);
-            const resData =JSON.parse(JSON.stringify(e));
+            const resData = JSON.parse(JSON.stringify(e));
+            console.log(resData);
             alert(resData.responseJSON.message);
             noDataRow();
         }
@@ -213,5 +231,3 @@ function storeSearchField(value) {
 function localStorageFind(value) {
     return localStorage.getItem(value);
 }
-
-

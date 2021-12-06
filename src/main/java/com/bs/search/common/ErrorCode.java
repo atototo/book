@@ -15,9 +15,9 @@ import lombok.Getter;
  */
 public enum ErrorCode {
 
-      NOT_NULL(10,"필수값이 누락되었습니다")
-    , UNMATCH_TYPE_VALUE(20, "검색 조건이 맞지 않습니다.")
-    , NOT_FOND(30, "검색결과가 없습니다.");
+    NOT_FOND(30, "검색결과가 없습니다."),
+    NOT_NULL(10, "필수값이 누락되었습니다"),
+    UNWATCH_TYPE_VALUE(20, "검색 조건이 맞지 않습니다.");
 
     @Getter
     private int code;
