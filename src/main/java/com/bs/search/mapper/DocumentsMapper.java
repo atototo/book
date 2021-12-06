@@ -20,6 +20,7 @@ import org.mapstruct.factory.Mappers;
  */
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DocumentsMapper {
+
     DocumentsMapper INSTANCE = Mappers.getMapper(DocumentsMapper.class);
 
     BookEntity bookApiToEntity(BookApi.Documents documentsVO, long id);

@@ -34,7 +34,7 @@ public class BookApi implements Serializable {
     @Setter
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     @AllArgsConstructor
-    @NoArgsConstructor      //json
+    @NoArgsConstructor
     @Builder
     public static class Documents {
 

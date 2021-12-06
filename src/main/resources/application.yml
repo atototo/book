@@ -42,8 +42,6 @@ log:
 book-api:
   uri: "https://dapi.kakao.com/v3/search/book"
 api:
-    head: Authorization
-    auth: KakaoAK
-    key: KakaoAK 8c65087a8ceb9dafcbcaefbd5bff3599
-    uri: https://dapi.kakao.com/v3/search/book?target=title
+  key: KakaoAK 8c65087a8ceb9dafcbcaefbd5bff3599
+  uri: https://dapi.kakao.com/v3/search/book?target=title
 

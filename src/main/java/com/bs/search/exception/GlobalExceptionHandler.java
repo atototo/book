@@ -29,16 +29,16 @@ public class GlobalExceptionHandler {
 
    @ExceptionHandler(BooksNotFoundException.class)
    @ResponseStatus(HttpStatus.BAD_REQUEST)
-   public  ResponseEntity<ErrorResponse>  handlePersonNotFoundException(BooksNotFoundException ex) {
-      ErrorResponse errorResponse =  ErrorResponse.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+   public ResponseEntity<ErrorResponse> handlePersonNotFoundException(BooksNotFoundException ex) {
+      ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, ex.getMessage());
       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
    }
 
 
    @ExceptionHandler(MethodArgumentNotValidException.class)
-   public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request){
-      log.info("MethodArgumentNotValidException 발생!!! url:{}, trace:{}",request.getRequestURI(), e.getStackTrace());
-      ErrorResponse errorResponse =  ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.UNWATCH_TYPE_VALUE.getDescription());
+   public ResponseEntity<ErrorResponse> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+      log.info("MethodArgumentNotValidException 발생!!! url:{}, trace:{}", request.getRequestURI(), e.getStackTrace());
+      ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.BAD_REQUEST, ErrorCode.UNWATCH_TYPE_VALUE.getDescription());
       return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
    }
 

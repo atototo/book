@@ -20,10 +20,10 @@ public enum ErrorCode {
     UNWATCH_TYPE_VALUE(20, "검색 조건이 맞지 않습니다.");
 
     @Getter
-    private int code;
+    private final int code;
 
     @Getter
-    private String description;
+    private final String description;
 
     ErrorCode(int code, String description) {
         this.code = code;
