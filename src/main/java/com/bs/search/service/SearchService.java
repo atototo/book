@@ -71,11 +71,9 @@ public class SearchService {
         int reqApiCnt = pageInfo.getReqApiCnt();
 
         // API RES Documents 부 추출
-        Collection<BookApi.Documents> list = IntStream.rangeClosed(1, reqApiCnt)
-                .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i,  PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toCollection(ArrayList::new));
-        LinkedList<BookApi.Documents> listDoc = new LinkedList<>(list);
+        LinkedList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
+                .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i, PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
+                .flatMap(Collection::stream).collect(Collectors.toCollection(LinkedList::new));
         // API Documents BookEntity 관련 저장
         bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i-1), i)).collect(Collectors.toCollection(ArrayList::new)));
         // Documents AuthEntity 관련 저장

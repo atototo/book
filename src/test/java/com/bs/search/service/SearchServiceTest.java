@@ -1,18 +1,25 @@
 package com.bs.search.service;
 
-import com.bs.search.common.ApiEnum;
-import com.bs.search.domain.BookRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import com.bs.search.domain.BookEntity;
+import com.bs.search.domain.PagingBookRepository;
+import com.bs.search.dto.PageSearchDto;
+import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * packageName : com.bs.search.service
@@ -25,74 +32,37 @@ import static org.junit.jupiter.api.Assertions.*;
  * -----------------------------------------------------------
  * 2021-12-06       isbn8         최초 생성
  */
+@ExtendWith(MockitoExtension.class)
 class SearchServiceTest {
-    @Autowired
-    SearchService searchService;
 
-    @Autowired
-    RestTemplate restTemplate;
+    @InjectMocks
+    private SearchService searchService;
 
-    @Autowired
-    private BookRepository bookRepository;
-
-
-    @Value("${api.uri}")
-    private String bookApiUri;
-
-    @Value("${api.key}")
-    private String key;
-
-    private int totalCount;
-    private UriComponents uri;
-    private HttpHeaders headers;
-
-    /**
-     * 요청 Uri 생성 용도
-     * @param page
-     * @param count
-     */
-    void makeUrl(int page, int count) {
-
-        uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
-                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
-                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
-                .queryParam("page",  page)
-                .queryParam("size", count)
-                .build();
-
-    }
-
-    @BeforeEach
-    void setHeaders() {
-        headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, key);
-    }
-
-    @BeforeEach
-    void setUp() {
-    }
-
-    @AfterEach
-    void tearDown() {
-    }
+    @Mock
+    private PagingBookRepository pagingBookRepository;
 
     @Test
-    void saveDocumentsAll() {
-    }
-
-    @Test
-    void findAllByTarget() {
-    }
-
-    @Test
+    @DisplayName("도서 목록 조회 like 조회 확인")
     void findAllByTitleLike() {
+
+        when(pagingBookRepository.findByTitleContaining(eq("프렌즈"), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Lists.newArrayList(BookEntity.builder().title("카카오 프렌즈 1").build())));
+
+
+        Page<BookEntity> response = searchService.findAllByTitleLike( mockPageDto(10000, 20000, 0, 10));
+
+//        Page<BookEntity> response = pagingBookRepository.findByTitleContaining("프렌즈", PageRequest.of(0,10));
+
+        assertThat(response.getNumberOfElements()).isEqualTo(1);
+        assertThat(response.getContent().get(0).getTitle()).isEqualTo("카카오 프렌즈 1");
+
     }
 
-    @Test
-    void findAllBooksByPrice() {
+    private PageSearchDto mockPageDto(long min, long max, int pageNum, int pageSize) {
+        MockitoAnnotations.openMocks(this);
+        return PageSearchDto.builder().title("프렌즈").minPrice(min).maxPrice(max).pageNum(pageNum).pageSize(pageSize).build();
     }
 
-    @Test
-    void makeKey() {
-    }
+
+
 }

@@ -36,8 +36,8 @@ public class PageSearchDto {
     private String sort;
     private  String title;
 
-    private int minPrice;
+    private long minPrice;
     @Max(500000)
-    private int maxPrice;
+    private long maxPrice;
 
 }

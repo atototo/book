@@ -2,6 +2,7 @@ package com.bs.search.service;
 
 import com.bs.search.common.ApiEnum;
 import com.bs.search.domain.*;
+import com.bs.search.dto.PageSearchDto;
 import com.bs.search.mapper.DocumentsMapper;
 import com.bs.search.vo.BookApi;
 import com.bs.search.vo.PageInfo;
@@ -96,7 +97,7 @@ class SearchServiceApiTest {
     }
 
     @Test
-    @DisplayName("Api요청 결과의 데이터 수와 저장 된 데이터의 수가 일치 하는지 확인")
+    @DisplayName("API 결과 데이터 수와 저장 된 데이터의 수가 일치 하는지 확인")
     void chkReqCnt() {
 
         //given
@@ -110,9 +111,7 @@ class SearchServiceApiTest {
         for (int i = 1; i <= reqApiCnt; i++) {
             makeUrl(i, 50);
             ArrayList<BookApi.Documents> documents = (ArrayList<BookApi.Documents>) Objects.requireNonNull(restTemplate.exchange(uri.toUri(), HttpMethod.GET, request, BookApi.class)).getBody().getDocuments();
-            for (BookApi.Documents document : documents) {
-                listDoc.add(document);
-            }
+            listDoc.addAll(documents);
         }
 
         bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size()).mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i-1), i)).collect(Collectors.toCollection(ArrayList::new)));
@@ -226,8 +225,26 @@ class SearchServiceApiTest {
 
 
     @Test
+    @DisplayName("")
     void findAllByTitleLike() {
+        //given
+        PageSearchDto pageSearchDto = PageSearchDto.builder()
+                .title("프렌즈")
+                .pageNum(0)
+                .pageSize(10)
+                .build();
+
+        //when
+        Page<BookEntity> response = searchService.findAllBooksByPrice(pageSearchDto);
+
+        //then
+        assertTrue(response.hasContent());
+        response.getContent().forEach(r ->{
+            assertTrue(r.getTitle().contains("프렌즈"));
+        });
+
     }
+
 
     @Test
     void findAllBooksByPrice() {
