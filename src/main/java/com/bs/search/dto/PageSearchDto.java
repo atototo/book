@@ -25,7 +25,7 @@ import javax.validation.constraints.NotBlank;
 @NoArgsConstructor
 public class PageSearchDto {
 
-    @NotBlank
+    @NotBlank             // null, "" , " " 모두 혀용하지 않는 것
     private String cdSearch;
 
     @Max(999)
@@ -36,6 +36,7 @@ public class PageSearchDto {
     private String sort;
     private  String title;
 
+    @Max(400000)
     private long minPrice;
     @Max(500000)
     private long maxPrice;

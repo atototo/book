@@ -1,6 +1,7 @@
 package com.bs.search.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -30,16 +31,23 @@ public class TranslatorsEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
-
-    @Column(name="transId")
+    @Column(name = "transId")
     private Long transId;
+
+//    @Column(name = "transId") //기존에 transId 라고 했었는데 참조 키 이므로 bookId 가 더 적합하다 생각된다.
+//    private Long transId;
 
     @Column(name = "title")
     private String title;
 
     @Column(name = "translators")
     private String translator;
+
+
+    @JsonBackReference
+    @ManyToOne
+    @JoinColumn(name = "bookId")
+    private BookEntity book;
+
 
 }

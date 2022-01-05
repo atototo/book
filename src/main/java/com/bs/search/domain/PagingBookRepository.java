@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+
 /**
  * packageName : com.bs.search.domain
  * fileName : PagingBookRepository
@@ -19,6 +20,5 @@ public interface PagingBookRepository extends JpaRepository<BookEntity, Long> {
 
      Page<BookEntity> findByTitleContaining(String title, Pageable pageable);
      Page<BookEntity> findAllByPriceBetween(long min,long max, Pageable pageable);
-
 
 }

@@ -83,7 +83,7 @@ function searchBooks(page) {
         url:"/searchBooks"
         , method : 'POST'
         , data : makeReqData(searchKind, page)
-        , async:false
+        , async:true
         , contentType: "application/json"
         , success :  function(resp){
             //도서목록 화면 표시
@@ -129,10 +129,10 @@ function makeTable(resp){
         insertUl = insertUl + "</a></li>";
         $("#dyn_ul").append(insertUl); //jquery append 사용해 동적으로 추가 실시
     }
+
     $('#dyn_tbody').empty();
     tableList.forEach(item => {
         // json 데이터 파싱 실시
-        console.log()
         const jsonObject = JSON.parse(JSON.stringify(item)); //각 배열에 있는 jsonObject 참조
         const id = jsonObject.id;
         const title = jsonObject.title;
@@ -162,7 +162,7 @@ function callPage(pageNum) {
         url:"/searchBooks"
         , method : 'POST'
         , data : makeReqData(searchKind, pageNum)
-        , async:false
+        , async: true
         , contentType: "application/json"
         , success :  function(resp){
             //도서목록 화면 표시

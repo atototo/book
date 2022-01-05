@@ -1,6 +1,7 @@
 package com.bs.search.common;
 
 import lombok.Getter;
+import org.springframework.http.HttpStatus;
 
 /**
  * packageName : com.bs.search.common
@@ -15,9 +16,10 @@ import lombok.Getter;
  */
 public enum ErrorCode {
 
-    NOT_FOND(30, "검색결과가 없습니다."),
-    NOT_NULL(10, "필수값이 누락되었습니다"),
-    UNWATCH_TYPE_VALUE(20, "검색 조건이 맞지 않습니다.");
+    NOT_FOND(HttpStatus.NOT_FOUND.value(), "검색결과가 없습니다."),
+    NOT_NULL(HttpStatus.BAD_REQUEST.value(), "필수값이 누락되었습니다"),
+    UNWATCH_TYPE_VALUE(HttpStatus.BAD_REQUEST.value(), "검색 조건이 맞지 않습니다."),
+    DB_ACCESS_FAIL(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터 조회중 문제 발생");
 
     @Getter
     private final int code;

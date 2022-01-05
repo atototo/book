@@ -1,6 +1,7 @@
 package com.bs.search.controller;
 
 import com.bs.search.domain.BookEntity;
+import com.bs.search.dto.BookInfoDto;
 import com.bs.search.dto.PageSearchDto;
 import com.bs.search.service.SearchService;
 import lombok.RequiredArgsConstructor;

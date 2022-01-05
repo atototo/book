@@ -18,7 +18,7 @@ function chgSearchForm(value){
         $("#titleForm").hide();
         $("#priceForm").show();
         $("#searchTitle").val("");
-    }
+    }위치
 }
 
 /**

@@ -3,6 +3,7 @@ package com.bs.search.service;
 
 import com.bs.search.domain.BookEntity;
 import com.bs.search.domain.PagingBookRepository;
+import com.bs.search.dto.BookInfoDto;
 import com.bs.search.dto.PageSearchDto;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;

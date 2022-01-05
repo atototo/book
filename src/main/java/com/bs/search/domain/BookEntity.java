@@ -1,11 +1,13 @@
 package com.bs.search.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -30,7 +32,7 @@ public class BookEntity implements Serializable {
 
     private static final long serialVersionUID = -6664369969831285247L;
     @Id // 해당 테이블의 PK 필드
-    @Column(name = "id")
+    @Column(name = "bookId")
     private Long id;
 
     @NotEmpty
@@ -64,12 +66,14 @@ public class BookEntity implements Serializable {
     @Column(name = "status")
     private String status;
 
-    @OneToMany( fetch = FetchType.LAZY)
-    @JoinColumn(name="authorId")
-    private Set<AuthorsEntity> authorsEntities;
+    @JsonManagedReference
+    @OneToMany( mappedBy = "book", fetch = FetchType.LAZY)
+//    @JoinColumn(name="authorId")
+    private List<AuthorsEntity> authorsEntities;
 
-    @OneToMany( fetch = FetchType.LAZY)
-    @JoinColumn(name="transId")
-    private Set<TranslatorsEntity> translatorsEntities;
+    @JsonManagedReference
+    @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+//    @JoinColumn(name="transId")
+    private List<TranslatorsEntity> translatorsEntities;
 
 }

@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class BooksNotFoundException extends RuntimeException {
+
     private static final long serialVersionUID = 2513506309216502071L;
 
     public BooksNotFoundException(String message) {

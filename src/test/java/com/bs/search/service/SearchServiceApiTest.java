@@ -50,6 +50,8 @@ class SearchServiceApiTest {
     @Autowired
     RestTemplate restTemplate;
 
+
+    //테스트를 다른곳에서 가져다 쓸 것이 아니기 때문에 그냥 Autowired 로 주입 받았다.
     @Autowired
     private BookRepository bookRepository;
     @Autowired
@@ -80,14 +82,45 @@ class SearchServiceApiTest {
         makeUrl(page, count);
 
         //when
-        ResponseEntity<BookApi>  response =  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class);
+        ResponseEntity<BookApi>  bookApiResponseEntity =  restTemplate.exchange( uri.toUri(), HttpMethod.GET, request, BookApi.class);
 
         //then
         assertAll(
-                () -> Assertions.assertThat(response.getStatusCodeValue()).hasToString("200"),
-                () -> Assertions.assertThat(Objects.requireNonNull(response.getBody()).getMeta().getTotalCount()).isPositive()
+                () -> Assertions.assertThat(bookApiResponseEntity.getStatusCodeValue()).hasToString("200"),
+                () -> Assertions.assertThat(Objects.requireNonNull(bookApiResponseEntity.getBody()).getMeta().getTotalCount()).isPositive()
         );
     }
+
+
+
+    @Test
+    @DisplayName("API 통신 확인 테스트 ")
+    void chkApiStauts() {
+        //given
+        int page =1;
+        int count = 10;
+
+        //when
+        ResponseEntity<BookApi>  bookApiResponseEntity =  searchService.bookApiExcute(page, count);
+
+        //then
+        assertEquals(HttpStatus.OK, bookApiResponseEntity.getStatusCode());
+
+    }
+
+    @Test
+    @DisplayName("API 통신 totalCount 에 따른 결과 확인")
+    void getListDoc() {
+        //given
+        int totalCount = 100;
+
+        //when
+        List<BookApi.Documents> listDoc = searchService.listBookApiDoc(totalCount);
+
+        //then
+        assertEquals(totalCount, listDoc.size());
+    }
+
 
 
     @BeforeEach

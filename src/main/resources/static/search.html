@@ -26,69 +26,69 @@
     </style>
     <script src="/js/search-view.js"></script>
 </head>
-    <body>
-         <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
-         <script src="https://netdna.bootstrapcdn.com/bootstrap/latest/js/bootstrap.min.js"></script>
-        <div class="container">
-            <h1>도서검색 하라우</h1>
-            <blockquote>
-                <p>도서명 또는 정가 금액으로 검색 가능 합니다</p>
-                <p>검색어 히스토리 </p>
-            </blockquote>
-            <div id="listSearched">
+<body>
+<link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css">
+<script src="https://netdna.bootstrapcdn.com/bootstrap/latest/js/bootstrap.min.js"></script>
+<div class="container">
+    <h1>도서검색 하라우</h1>
+    <blockquote>
+        <p>도서명 또는 정가 금액으로 검색 가능 합니다</p>
+        <p>검색어 히스토리 </p>
+    </blockquote>
+    <div id="listSearched">
+    </div>
+    <br/>
+    <form>
+        <legend>
+            <div class="form-group">
+                <label for="searchKind">검색구분</label>
+                <select id="searchKind" class="form-control" onchange="chgSearchForm(this.value)">
+                    <option selected="selected" value="bookTitle">도서명</option>
+                    <option value="bookPrice">정가 금액</option>
+                </select>
             </div>
-            <br/>
-            <form>
-                <legend>
-                    <div class="form-group">
-                        <label for="searchKind">검색구분</label>
-                        <select id="searchKind" class="form-control" onchange="chgSearchForm(this.value)">
-                            <option selected="selected" value="bookTitle">도서명</option>
-                            <option value="bookPrice">정가 금액</option>
-                        </select>
-                    </div>
-                    <div id="titleForm" class="form-group">
-                        <label for="searchTitle">도서 검색</label>
-                        <input type="text" id="searchTitle" class="form-control" maxlength="50">
-                    </div>
-
-                    <div id="priceForm" class="form-group" style="display: none;">
-                        <label> 검색 금액 범위</label>
-                        <label for="searchPriceMin"></label><input type="number" maxlength="6" value="0" id="searchPriceMin" class="form-control">
-                        <span>~</span>
-                        <label for="searchPriceMax"></label><input type="number" maxlength="6" value="0" id="searchPriceMax" class="form-control">
-                    </div>
-
-                    <button type="button" onclick="searchBooks('0')" class="btn btn-primary">조회</button>
-                    <button type="button" onclick="window.location.reload()" class="btn btn-primary">reset</button>
-                </legend>
-                <span id="resResult"></span>
-            </form>
-            <br />
-            <div id="list">
-                <!-- 테이블 속성 정의 -->
-                <table class="table">
-                    <caption>카카오 API 도서 목록</caption>
-                    <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">도서 고유번호</th>
-                        <th scope="col">도서명</th>
-                        <th scope="col">정가</th>
-                    </tr>
-                    </thead>
-                    <tbody id="dyn_tbody">
-                    </tbody>
-                </table>
-
-                <!-- 페이징 속성 정의 -->
-                <nav aria-label="Page navigation example">
-                    <ul id="dyn_ul" class="pagination" style="justify-content: center;">
-                    </ul>
-                </nav>
-
+            <div id="titleForm" class="form-group">
+                <label for="searchTitle">도서 검색</label>
+                <input type="text" id="searchTitle" class="form-control" maxlength="50">
             </div>
 
-        </div>
-    <script src="/js/search-api.js"></script>
-    </body>
+            <div id="priceForm" class="form-group" style="display: none;">
+                <label> 검색 금액 범위 (최대 50,0000 까지 가능)</label>
+                <label for="searchPriceMin"></label><input type="number" min="0" max="500000" value="0" id="searchPriceMin" class="form-control">
+                <span>~</span>
+                <label for="searchPriceMax"></label><input type="number" min="0" maxlength="500000" value="0" id="searchPriceMax" class="form-control">
+            </div>
+
+            <button type="button" onclick="searchBooks('0')" class="btn btn-primary">조회</button>
+            <button type="button" onclick="window.location.reload()" class="btn btn-primary">reset</button>
+        </legend>
+        <span id="resResult"></span>
+    </form>
+    <br />
+    <div id="list">
+        <!-- 테이블 속성 정의 -->
+        <table class="table">
+            <caption>카카오 API 도서 목록</caption>
+            <thead class="thead-dark">
+            <tr>
+                <th scope="col">도서 고유번호</th>
+                <th scope="col">도서명</th>
+                <th scope="col">정가</th>
+            </tr>
+            </thead>
+            <tbody id="dyn_tbody">
+            </tbody>
+        </table>
+
+        <!-- 페이징 속성 정의 -->
+        <nav aria-label="Page navigation example">
+            <ul id="dyn_ul" class="pagination" style="justify-content: center;">
+            </ul>
+        </nav>
+
+    </div>
+
+</div>
+<script src="/js/search-api.js"></script>
+</body>
 </html>

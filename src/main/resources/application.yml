@@ -18,14 +18,17 @@ spring:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:userdb;DB_CLOSE_DELAY=-1
     username: sa
+#    : 스프링부트 2.4부터는 spring.datasource.username=sa 를 꼭 추가해주어야 한다. 그렇지 않으면 오류 발생생
     password:
   jpa:
-    properties:
+   properties:
       hibernate:
         globally_quoted_identifiers: true
         format_sql: true
-        show_sql: false
+        show_sql: true
         ddl-auto: create-drop
+#        hibernate.default_batch_fetch_size: 1000
+#        entity 를 바탕으로 테이블 직접생성 기능
         id:
           new_generator_mappings: false
       hbm2ddl:
@@ -33,14 +36,14 @@ spring:
 
 logging:
   level:
-    com.bs.search: INFO
+    com.bs.search: info
 
 log:
   pattern: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%X{identity}] %msg %n"
   appender: console
 
 book-api:
-  uri: "https://dapi.kakao.com/v3/search/book"
+  uri: "https://dapi.kakeo.com/v3/search/book"
 api:
   key: KakaoAK 8c65087a8ceb9dafcbcaefbd5bff3599
   uri: https://dapi.kakao.com/v3/search/book?target=title
