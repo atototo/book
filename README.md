@@ -10,6 +10,8 @@
 
 > * H2 DB는 memory 방식으로 되어있어 서버를 재시작하면 데이타가 초기화 됩니다. 
 
+> * SpringSecurity, KAKAO API 로그인 적용 중 입니다. 
+
 <hr/>
 
 ## SPEC & Tech
@@ -17,7 +19,8 @@
 `HTML` `BootStrap` `JavaScript` `JQuery` `CSS`
 ### Back-End
 `Java 11` `spring-boot` `h2 (gradle dependency)` `JPA` `Junit`  <br/><br/>
-`lombok` `RestTemplate` `HttpEntity` `Ehcache` `Validation` `Advice`
+`lombok` `RestTemplate` `HttpEntity` `Ehcache` `Validation` `Advice` <br/><br/>
+`SpringSecurity`
 
 
 
