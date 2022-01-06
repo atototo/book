@@ -47,6 +47,9 @@ class SearchServiceApiTest {
     @Autowired
     SearchService searchService;
 
+   @Autowired
+    SearchApiService searchApiService;
+
     @Autowired
     RestTemplate restTemplate;
 
@@ -101,7 +104,7 @@ class SearchServiceApiTest {
         int count = 10;
 
         //when
-        ResponseEntity<BookApi>  bookApiResponseEntity =  searchService.bookApiExcute(page, count);
+        ResponseEntity<BookApi>  bookApiResponseEntity =  searchApiService.bookApiExcute(page, count);
 
         //then
         assertEquals(HttpStatus.OK, bookApiResponseEntity.getStatusCode());

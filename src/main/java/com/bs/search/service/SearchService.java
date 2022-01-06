@@ -71,60 +71,6 @@ public class SearchService {
     @Value("${api.key}")
     private String key;
 
-
-    /**
-     * methodName : searchHome
-     * author : yelee
-     * description : API 카카오 키워드 조회하여 모두 저장
-     * @void
-     */
-    @Transactional(rollbackOn = Exception.class)  //리팩토링 사항으로 추가 필요 저장하는 로직이 처음 어플리케이션 뜨는 곳 외에는 없으니 여기만 추가해도 될듯
-    public void saveDocumentsAll() {
-
-        //한번에 최대 50개씩 :: API 최대 제공 개수로 지정 위해서
-        ResponseEntity<BookApi> responseEntity;
-        try {
-//          responseEntity = requireNonNull(createUriCompnentAndExcute(ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), ChkCnt.REQ_MAX_CNT.getCnt()));
-          responseEntity = requireNonNull(bookApiExcute(ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), ChkCnt.REQ_MAX_CNT.getCnt()));
-
-        } catch (RestClientException e) {
-            log.info("RestClientException");
-            throw new ApiUnstableException();
-
-        }
-
-        // API 조회에는 성공했으나 조회 건수가 없는 경우 개발자에게 알림 후 종료
-        int totalCnt = requireNonNull(responseEntity.getBody()).getMeta().getTotalCount();
-        if (totalCnt == 0) {
-            throw new ApiNodataException("API 조회 건수가 없습니다.");
-        }
-
-
-        PageInfo pageInfo = new PageInfo(totalCnt);
-        int reqApiCnt = pageInfo.getReqApiCnt();
-        // API RES Documents 부분 추출
-        LinkedList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
-                .mapToObj(i -> (ArrayList<BookApi.Documents>) requireNonNull(bookApiExcute(i, ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
-                .flatMap(Collection::stream)
-                //위에서 받은 배열을 하나의 stream 반환 한다는 의미
-                .collect(Collectors.toCollection(LinkedList::new));
-
-        // API Documents BookEntity 관련 저장
-        // id 넣어줄 때 0부터 넣을 수 는 없어서 1로 시작
-        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size())
-                .mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i - 1), i))
-                //mapper 이용하여 api 정보를 bookEntity 맞게 변환, authors, translators 제외
-                .collect(Collectors.toCollection(ArrayList::new)));
-
-        // Documents AuthEntity 관련 저장
-        authorsRepository.saveAll(makeDocumentsToAuthorsList(listDoc));
-
-        // Documents TranslatorEntity 관련 저장
-        translatorsRepository.saveAll(makeDocumentToTranslatorsList(listDoc));
-
-    }
-
-
     /**
      * methodName : searchHome
      * author : yelee
@@ -137,7 +83,7 @@ public class SearchService {
         //한번에 최대 50개씩 :: API 최대 제공 개수로 지정 위해서
         ResponseEntity<BookApi> responseEntity;
         try {
-            responseEntity = requireNonNull(bookApiExcute(ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), ChkCnt.REQ_MAX_CNT.getCnt()));
+            responseEntity = requireNonNull(searchApiService.bookApiExcute(ChkCnt.REQ_CHK_PAGE_CNT.getCnt(), ChkCnt.REQ_MAX_CNT.getCnt()));
 
         } catch (RestClientException e) {
             log.info("RestClientException");
@@ -176,7 +122,7 @@ public class SearchService {
         // API RES Documents 부분 추출
 
         return IntStream.rangeClosed(1, reqApiCnt)
-                .mapToObj(i -> (ArrayList<BookApi.Documents>) requireNonNull(bookApiExcute(i, ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
+                .mapToObj(i -> (ArrayList<BookApi.Documents>) requireNonNull(searchApiService.bookApiExcute(i, ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
                 .flatMap(Collection::stream)
                 //위에서 받은 배열을 하나의 stream 반환 한다는 의미
                 .collect(Collectors.toCollection(LinkedList::new));
@@ -215,118 +161,6 @@ public class SearchService {
 
 
     /**
-     * Book Api 통신
-     * @param page
-     * @param count
-     * @return ResponseEntity<BookApi>
-     */
-    public ResponseEntity<BookApi> bookApiExcute(int page, int count) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, key);
-        HttpEntity<?> request = new HttpEntity(headers);
-        //HttpEntity 클래스 http 요청 또는 응답에 해당하는 HttpHeader, HttpBody 를 포함하고 있다.
-
-        // 쿼리에 한글이 포함되기 때문에 인코딩 완료된  URI 타입으로 사용
-        // exchange() http method any,  HTTP 헤더 만들 수 있다. 또한 ResponseEntity 형식으로 반환된다.
-        return restTemplate.exchange(createUriComponents(page, count), HttpMethod.GET, request, BookApi.class);
-    }
-
-
-    /**
-     * API URI 정보 생성
-     * @param page
-     * @param count
-     * @return URI
-     */
-    public URI createUriComponents(int page, int count) {
-        // UriComponents 는 URI 를 동적으로 생성해주는 클래스다.
-        // 파라미터가 조합된 URI 를 손쉽게 만들어 주어 코드 상의 직접 문자열 조합 시의 실수를 방지 할 수 있다.
-        UriComponents uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
-                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
-                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
-                .queryParam("page", page)
-                .queryParam("size", count)
-                .build();
-
-        return uri.toUri();
-    }
-
-//    @Transactional  //리팩토링 사항으로 추가 필요 저장하는 로직이 처음 어플리케이션 뜨는 곳 외에는 없으니 여기만 추가해도 될듯
-//    public void saveDocumentsAllRe() {
-//
-//        ResponseEntity<BookApi> responseEntity = searchApiService.getBookApiResponseEntity();
-//
-//        // API 통신 성공여부 확인 3회 다시 트라이
-//        if (!HttpStatus.OK.equals(responseEntity.getStatusCode())) {
-//
-//        }
-//
-//        // total Count 0 인 경우 3회 다시 트라이
-//        if (Objects.requireNonNull(responseEntity.getBody()).getMeta().getTotalCount() == 0) {
-//            //슬랙 알람
-//            // 서버 다운
-//        }
-//
-//
-//
-//        PageInfo pageInfo = new PageInfo(totalCnt);
-//        int reqApiCnt = pageInfo.getReqApiCnt();
-//
-//        // API RES Documents 부분 추출
-//        LinkedList<BookApi.Documents> listDoc = IntStream.rangeClosed(1, reqApiCnt)
-//                .mapToObj(i -> (ArrayList<BookApi.Documents>) Objects.requireNonNull(createUriCompnentAndExcute(i, PageInfo.ChkCnt.REQ_MAX_CNT.getCnt()).getBody()).getDocuments())
-//                .flatMap(Collection::stream)
-//                //위에서 받은 배열을 하나의 stream 반환 한다는 의미
-//                .collect(Collectors.toCollection(LinkedList::new));
-//
-//        // API Documents BookEntity 관련 저장
-//        // id 넣어줄 때 0부터 넣을 수 는 없어서 1로 시작
-//        bookRepository.saveAll(IntStream.rangeClosed(1, listDoc.size())
-//                .mapToObj(i -> DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i - 1), i))
-//                //mapper 이용하여 api 정보를 bookEntity 맞게 변환, authors, translators 제외
-//                .collect(Collectors.toCollection(ArrayList::new)));
-//
-//        // Documents AuthEntity 관련 저장
-//        authorsRepository.saveAll(makeDocumentsToAuthorsList(listDoc));
-//
-//        // Documents TranslatorEntity 관련 저장
-//        translatorsRepository.saveAll(makeDocumentToTranslatorsList(listDoc));
-//
-//
-//    }
-
-
-    /**
-     * methodName : createUriCompnentAndExcute
-     * author : yelee
-     * description : API 요청 메소드
-     *
-     * @param page
-     * @param count
-     * @return ResponseEntity<BookApi>
-     */
-    private ResponseEntity<BookApi> createUriCompnentAndExcute(int page, int count) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, key);
-        HttpEntity<?> request = new HttpEntity(headers);
-        //HttpEntity 클래스 http 요청 또는 응답에 해당하는 HttpHeader, HttpBody 를 포함하고 있다.
-
-
-        // UriComponents 는 URI 를 동적으로 생성해주는 클래스다.
-        // 파라미터가 조합된 URI 를 손쉽게 만들어 주어 코드 상의 직접 문자열 조합 시의 실수를 방지 할 수 있다.
-        UriComponents uri = UriComponentsBuilder.fromHttpUrl(bookApiUri)
-                .queryParam(ApiEnum.TARGET_KEY.getValue(), ApiEnum.TARGET_VALUE.getValue())
-                .queryParam(ApiEnum.QUERY_KEY.getValue(), ApiEnum.QUERY_VALUE.getValue())
-                .queryParam("page", page)
-                .queryParam("size", count)
-                .build();
-
-        // 쿼리에 한글이 포함되기 때문에 인코딩 완료된  URI 타입으로 사용
-        // exchange() http method any,  HTTP 헤더 만들 수 있다. 또한 ResponseEntity 형식으로 반환된다.
-        return restTemplate.exchange(uri.toUri(), HttpMethod.GET, request, BookApi.class);
-    }
-
-    /**
      * methodName : makeDocumentToTranslatorsList
      * author : yelee
      * description :API response documents 부분 중 translator 추출
@@ -336,18 +170,6 @@ public class SearchService {
      */
     private List<TranslatorsEntity> makeDocumentToTranslatorsList(LinkedList<BookApi.Documents> listDoc) {
         ArrayList<TranslatorsEntity> listTranslators = new ArrayList<>();
-//        IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
-//            List<String> listTrans = listDoc.get(i - 1).getTranslators();
-//            if (!listTrans.isEmpty()) listTrans.stream()
-//                    .map(translator -> TranslatorsEntity.builder()
-//                            .transId((long) i)
-//                            .title(listDoc.get(i - 1).getTitle())
-//                            .translator(translator)
-//                            .build())
-//                    .forEach(listTranslators::add);
-//        });
-
-
 
         IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
             List<String> listTrans = listDoc.get(i - 1).getTranslators();        // 책 한권당 저작궈자 여러명이고 없을 수도 있다.
@@ -379,23 +201,6 @@ public class SearchService {
     private List<AuthorsEntity> makeDocumentsToAuthorsList(LinkedList<BookApi.Documents> listDoc) {
 
         ArrayList<AuthorsEntity> listAuthors = new ArrayList<>();
-//        IntStream.range(1, listDoc.size())
-//                .forEachOrdered(i -> {                                              // 순서 보장 필요
-//                    List<String> listAuth = listDoc.get(i - 1).getAuthors();        // 책 한권당 저작궈자 여러명이고 없을 수도 있다.
-//                    if (!listAuth.isEmpty()) {
-//                        BookEntity book = DocumentsMapper.INSTANCE.bookApiToEntity(listDoc.get(i-1), i);
-//                        listAuth.stream()
-//                                .map(author -> AuthorsEntity.builder()
-//                                        .authorId((long) i)
-//                                        .title(listDoc.get(i - 1).getTitle())
-//                                        .author(author).build()
-////                                        .setBook(book)
-//
-//                                )
-//
-//                                .forEach(listAuthors::add);
-//                    }
-//                });
 
         IntStream.range(1, listDoc.size()).forEachOrdered(i -> {
             List<String> listAuth = listDoc.get(i - 1).getAuthors();        // 책 한권당 저작궈자 여러명이고 없을 수도 있다.
@@ -486,7 +291,6 @@ public class SearchService {
      * @return string
      */
     public static String makeKey(PageSearchDto pageSearchDto) {
-//        return pageSearchDto.getTitle() + "_" + pageSearchDto.getPageNum() + "_" + pageSearchDto.getMinPrice() + "_" + pageSearchDto.getMaxPrice();
         return new StringJoiner("_")
                 .add(pageSearchDto.getTitle())
                 .add(String.valueOf(pageSearchDto.getPageNum()))
