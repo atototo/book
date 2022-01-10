@@ -7,14 +7,12 @@ import com.bs.search.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -45,8 +43,24 @@ public class SearchController {
      * @param model
      * @return string
      */
+    @GetMapping("/login")
+    public String searchIndex(Model model) {
+        return "index.html";
+    }
     @GetMapping("/")
+    public String mian(Model model) {
+        return "search.html";
+    }
+    @GetMapping("/login/oauth2/code/google")
+    public String loginGoogle(@RequestParam String code, HttpRequest request) {
+        log.info("code : {}", code);
+        log.info("request : {}", request.toString());
+        return "search.html";
+    }
+
+    @GetMapping("/search/main")
     public String searchHome(Model model) {
+        log.info("왜안와아ㅏㅇ아ㅏ아앙");
         return "search.html";
     }
 
@@ -58,7 +72,7 @@ public class SearchController {
      * @param pageSearchDto
      * @return
      */
-    @PostMapping(value = "/searchBooks", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/search/searchBooks", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<Page<BookEntity>> booksListByTarget(@RequestBody @Valid PageSearchDto pageSearchDto) {
         Page<BookEntity> response = searchService.findAllByTarget(pageSearchDto);

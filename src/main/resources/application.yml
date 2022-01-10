@@ -25,7 +25,7 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
         format_sql: true
-        show_sql: true
+        show_sql: false
         ddl-auto: create-drop
 #        hibernate.default_batch_fetch_size: 1000
 #        entity 를 바탕으로 테이블 직접생성 기능
@@ -37,6 +37,10 @@ spring:
     oauth2:
       client:
         registration:
+          google :
+            client-id: 345365462651-cv5lp2m1kr48gb1hpc5o0bis9mrqjq7p.apps.googleusercontent.com
+            client-secret: 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
+            scope: profile, email
           kakao:
             authorization-grant-type: authorization_code
             client-id: 8c65087a8ceb9dafcbcaefbd5bff3599

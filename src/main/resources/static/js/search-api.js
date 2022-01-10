@@ -80,7 +80,7 @@ function searchBooks(page) {
 
     //도서 목록 조회
     $.ajax({
-        url:"/searchBooks"
+        url:"/search/searchBooks"
         , method : 'POST'
         , data : makeReqData(searchKind, page)
         , async:true
@@ -159,7 +159,7 @@ function makeTable(resp){
 function callPage(pageNum) {
     let searchKind = $("#searchKind option:selected").val();
     $.ajax({
-        url:"/searchBooks"
+        url:"/search/searchBooks"
         , method : 'POST'
         , data : makeReqData(searchKind, pageNum)
         , async: true
