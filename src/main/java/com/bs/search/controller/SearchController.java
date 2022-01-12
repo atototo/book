@@ -10,11 +10,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.security.Principal;
+import java.util.Collection;
+import java.util.Iterator;
 
 
 /**
@@ -47,20 +54,29 @@ public class SearchController {
     public String searchIndex(Model model) {
         return "index.html";
     }
-    @GetMapping("/")
-    public String mian(Model model) {
-        return "search.html";
-    }
-    @GetMapping("/login/oauth2/code/google")
-    public String loginGoogle(@RequestParam String code, HttpRequest request) {
-        log.info("code : {}", code);
-        log.info("request : {}", request.toString());
-        return "search.html";
-    }
 
-    @GetMapping("/search/main")
+    @GetMapping("/")
     public String searchHome(Model model) {
-        log.info("왜안와아ㅏㅇ아ㅏ아앙");
+        // 시큐리티 컨텍스트 객체를 얻습니다.
+        SecurityContext context = SecurityContextHolder.getContext();
+        log.info("context  : {}", context);
+        // 인증 객체를 얻습니다.
+         Authentication authentication = context.getAuthentication();
+
+        log.info("authentication  : {}", authentication);
+
+
+        log.info("principal  : {}",  authentication.getPrincipal());
+        // 사용자가 가진 모든 롤 정보를 얻습니다.
+         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+         Iterator<? extends GrantedAuthority> iter = authorities.iterator();
+         while (iter.hasNext()) {
+             GrantedAuthority auth = iter.next();
+             System.out.println(auth.getAuthority());
+         }
+
+
+
         return "search.html";
     }
 
